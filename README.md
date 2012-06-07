@@ -2,7 +2,7 @@ mauve.js
 =====
 
 Mauve is a JavaScript library similar to jQuery / Zepto core for modern browsers.
-
+Mauve currently minifies in Google Closure Compiler's advanced mode without warnings and passes JSHint.
 
 #Goals
 
@@ -12,8 +12,6 @@ Mauve is a JavaScript library similar to jQuery / Zepto core for modern browsers
 - Be familiar to jQuery / Zepto users
 - Be free to depart from the jQuery / Zepto API
 - Be well documented, especially where departing from the jQuery or Zepto API
-- Be accommodating of any browser that has a good ES5 and DOM implementation and support for setting \_\_proto\_\_
-
 
 #Supported Browsers
 
@@ -26,5 +24,4 @@ Mauve is a JavaScript library similar to jQuery / Zepto core for modern browsers
 #Currently Unsupported Browsers
 
 - Internet Explorer
-- Opera (mostly because of \_\_proto\_\_
-- \*
+- Opera (mostly because of \_\_proto\_\_)
