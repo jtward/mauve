@@ -604,10 +604,12 @@ window['$'] = (function() {
     };
 
     mauvefn.eq = function(index) {
-        if (index >= 0) {
-            return mauve(arr(this[index] || this[index % this.length]));
-        } else if (index < 0) {
-            return mauve(arr(this[this.length + index] || this[(-index) % this.length]));
+        if(this.length) {
+            if (index >= 0) {
+                return mauve(arr(this[index] || this[index % this.length]));
+            } else if (index < 0) {
+                return mauve(arr(this[this.length + index] || this[(-index) % this.length]));
+            }
         }
         return mauve(arr());
     };
