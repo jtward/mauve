@@ -118,13 +118,13 @@ Return a mauve array containing all of the immediate children of each of the nod
 Return a mauve array containing deep clones of each of the nodes in this mauve array.
 This method doesn't have an option for copying data and event handlers over to the new elements, as it has in jQuery.
 
-###$.closest
+###$.fn.closest
 `$(...).closest(selector, [context]) => mauve array`
 
 Return a mauve array containing the first elements that match the given selector in a walk up the DOM heirarchy from each node in this mauve array including the nodes themselves.
 If a context is given, the selection is limited to descendants of the nodes represented by the context.
 
-###$.css
+###$.fn.css
 `$(...).css(property) => value`
 
 Return the value of the given CSS property from the first node in this mauve array. The value is fetched from the computed style of the element, or from the style property if the computed value is falsy, as it would be if the element were not in the DOM.
@@ -132,6 +132,37 @@ Return the value of the given CSS property from the first node in this mauve arr
 `$(...).css(property, value) => value`
 
 Set the value of the given CSS property to the given value for all of the nodes in this mauve array.
+
+###$.fn.eq
+`$(...).eq(index) => mauve array`
+
+Return a mauve array containing the element at the given index in this mauve array. The index may be negative and is wrapped using the length of this mauve array as the modulus. If this mauve array is empty return an empty mauve array.
+
+###$.fn.find
+`$(...).find(selector) => mauve array`
+
+Return a mauve array containing the nodes which match the given selector and are descendents of any element in this mauve array.
+
+###$.fn.findFirst
+`$(...).find(selector) => mauve array`
+
+Return a mauve array containing the first node which matches the given selector and is a descendent of any element in this mauve array.
+
+###$.fn.first
+`$(...).first() => mauve array`
+
+Return a mauve array containing the first element in this mauve array, or an empty mauve array if this mauve array is empty.
+
+###$.fn.get
+`$(...).get() => Node[]`
+
+Return a plain array of the elements in this mauve array.
+
+`$(...).get(index) => Node`
+
+Return the node at the given index in this mauve array. The index may be negative and is wrapped using the length of this mauve array as the modulus. If this mauve array is empty return undefined.
+
+
 
 #Supported Browsers
 
