@@ -221,7 +221,10 @@ window['$'] = (function() {
             this.parentNode.insertBefore(el, this.nextSibling);
         };
     var $reverseBeforeNode = function(el) {
-            this.parentNode.insertBefore(el, this);
+            var parent = el.parentNode;
+            if (parent) {
+                parent.insertBefore(el, this);
+            }
         };
 
 
@@ -446,7 +449,10 @@ window['$'] = (function() {
             el.outerHTML = this + el.outerHTML;
         },
         beforeNode: function(el) {
-            el.parentNode.insertBefore(this, el);
+            var parent = el.parentNode;
+            if (parent) {
+                parent.insertBefore(this, el);
+            }
         },
         beforeNodes: function(el) {
             this.forEach($reverseBeforeNode, el);
@@ -462,6 +468,9 @@ window['$'] = (function() {
             } else if (stuff instanceof Node) {
                 this.forEach(withNode, stuff);
             } else if (stuff instanceof arr) {
+                this.forEach(withNodes, stuff);
+            } else if (stuff instanceof NodeList) {
+                stuff = slice.call(stuff, 0);
                 this.forEach(withNodes, stuff);
             }
             return this;
@@ -571,6 +580,15 @@ window['$'] = (function() {
 
     mauvefn.closest = function(selector, context) {
         var node = this[0];
+        if (typeof(context) === 'string') {
+            context = qs(context, undefined);
+        } else if (context instanceof mauve) {
+            context = context[0];
+        } else if (context instanceof arr) {
+            context = context.filter($fromUnknown)[0];
+        } else if (context instanceof NodeList) {
+            context = slice.call(context, 0).filter($nodeType)[0];
+        }
         while (node && !(node[matchesSelector] ? node[matchesSelector](selector) : false)) {
             node = node !== context && node !== document && node.parentNode;
         }
@@ -698,12 +716,14 @@ window['$'] = (function() {
                 } else {
                     return $.queryAll(query, context);
                 }
-            } else if (query instanceof Node && documentNodeTypes.indexOf(query.nodeType) !== -1) {
-                return mauve(arr(query));
             } else if (query instanceof mauve) {
                 return query;
             } else if (query instanceof arr) {
                 return mauve(query.filter($fromUnknown));
+            } else if (query instanceof NodeList) {
+                return mauve(slice.call(query).filter($nodeType));
+            } else if (query instanceof Node && documentNodeTypes.indexOf(query.nodeType) !== -1) {
+                return mauve(arr(query));
             } else if (typeof(query) === 'function') {
                 if (documentReadyStates.indexOf(document.readyState) !== -1) {
                     query($);
@@ -728,7 +748,12 @@ window['$'] = (function() {
             } else if (context instanceof mauve) {
                 // $.query('.bar', [mauve]) is the same as [mauve].find('.bar')
                 return context.find(query);
-            } else if (context.querySelectorAll) {
+            } else if (context instanceof arr) {
+                // $.query('.bar', [array]) is the same as mauve([array]).find('.bar')
+                return mauve(context.filter($fromUnknown)).find(query);
+            } else if (context instanceof NodeList) {
+                return mauve(slice.call(context).filter($nodeType)).find(query);
+            } else if (context instanceof Node && documentNodeTypes.indexOf(context.nodeType) !== -1) {
                 return mauve(qsa(query, context));
             } else {
                 return mauve(arr());
@@ -746,7 +771,12 @@ window['$'] = (function() {
             } else if (context instanceof mauve) {
                 // $.query('.bar', [mauve]) is the same as [mauve].find('.bar')
                 return context.findFirst(query);
-            } else if (context.querySelector) {
+            } else if (context instanceof arr) {
+                // $.query('.bar', [mauve]) is the same as [mauve].find('.bar')
+                return mauve(context.filter($fromUnknown)).findFirst(query);
+            } else if (context instanceof NodeList) {
+                return mauve(slice.call(context).filter($nodeType)).find(query);
+            } else if (context instanceof Node && documentNodeTypes.indexOf(context.nodeType) !== -1) {
                 return mauve(arr(qs(query, context)));
             } else {
                 return mauve(arr());
