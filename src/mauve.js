@@ -389,11 +389,15 @@ window['$'] = (function() {
     var mauvefn = mauve.prototype;
 
     mauvefn.findFirst = function(selector) {
-        if (this.length === 1) {
-            return mauve(arr($query.call(selector, this[0])));
-        } else {
-            return mauve(this.map($query, selector).reduce($concat).filter($uniq));
+        var i = 0, max = this.length, result;
+        while(i < max) {
+            result = $query.call(selector, this[i]);
+            if(result) {
+                return mauve(arr(result));
+            }
+            i += 1;
         }
+        return mauve(arr());
     };
 
     mauvefn.find = function(selector) {
