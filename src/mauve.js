@@ -781,7 +781,7 @@ window['$'] = (function() {
                 // $.query('.bar', [mauve]) is the same as [mauve].find('.bar')
                 return mauve(context.filter($fromUnknown)).findFirst(query);
             } else if (context instanceof NodeList) {
-                return mauve(slice.call(context).filter($nodeType)).find(query);
+                return mauve(slice.call(context).filter($nodeType)).findFirst(query);
             } else if (context instanceof Node && documentNodeTypes.indexOf(context.nodeType) !== -1) {
                 return mauve(arr(qs(query, context)));
             } else {
