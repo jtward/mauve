@@ -172,7 +172,7 @@ Return a true if the first element in this mauve array has the given CSS class, 
 
 Return the computed value for the height of the first element in this mauve array. The given extent defines how to measure the height. This function is quite defferent to both the jQuery and Zepto implementations.
 
-If no value is given or the value is `$.dimensions.BOXSIZING` then the height is calculated using the current box-sizing of the given element. A box-sizing of 'content-box' evaluates to $.dimensions.CONTENT, a box-sizing of 'padding-box' evaluates to $.dimensions.PADDING and a box-sizing of 'border-box' evaluates to $.dimensions.BORDER. Note that there is no 'margin-box' and 'padding-box' is only available in Gecko and is currently under review.
+If no value is given or the value is `$.dimensions.BOXSIZING` then the height is calculated using the current box-sizing of the given element. A box-sizing of 'content-box' evaluates to `$.dimensions.CONTENT`, a box-sizing of 'padding-box' evaluates to `$.dimensions.PADDING` and a box-sizing of 'border-box' evaluates to `$.dimensions.BORDER`. Note that there is no 'margin-box' and 'padding-box' is only available in Gecko and is currently under review.
 
 If the value is `$.dimensions.CONTENT` then the returned value is the height of the content box of the given element. 
 
