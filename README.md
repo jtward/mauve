@@ -165,7 +165,7 @@ Return the node at the given index in this mauve array. The index may be negativ
 ###$.fn.hasClass
 `$(...).hasClass(className) => boolean[]`
 
-Return a true if the first element in this mauve array has the given CSS class, false otherwise. Unlike jQuery, passing a comma-delimited string of class names is not supported.
+Return true if the first element in this mauve array has the given CSS class, false otherwise. Unlike jQuery, passing a comma-delimited string of class names is not supported.
 
 ###$.fn.height
 `$(...).height([extent=$.dimensions.BOXSIZING]) => number`
