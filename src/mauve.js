@@ -378,6 +378,36 @@ window['$'] = (function() {
             return context.querySelector(selector);
         };
 
+    /**
+     * GetElement(s)By{x}
+     * For singular, return a Node
+     * For multiple, return a plain array
+     */
+    var getElementById = function(selector, context) {
+            return context.getElementById(selector);
+        };
+    var $getElementsById = function(el) {
+            return arr(el.getElementById(this));
+        };
+    var getElementByClassName = function(selector, context) {
+            return context.getElementsByClassName(selector)[0];
+        };
+    var $getElementsByClassName = function(el) {
+            return slice.call(el.getElementsByClassName(this));
+        };
+    var getElementByTagName = function(selector, context) {
+            return context.getElementsByTagName(selector)[0];
+        };
+    var $getElementsByTagName = function(el) {
+            return slice.call(el.getElementsByTagName(this));
+        };
+    var getElementByQuery = function(selector, context) {
+            return context.querySelector(selector);
+        };
+    var $getElementsByQuery = function(el) {
+            return slice.call(el.querySelectorAll(this));
+        };
+
     var mauve = function(arr) {
             // mauve is a sublcass of Array.
             // this is the way to do it iff we can write to __proto__; no copying required!
@@ -389,10 +419,33 @@ window['$'] = (function() {
     var mauvefn = mauve.prototype;
 
     mauvefn.findFirst = function(selector) {
-        var i = 0, max = this.length, result;
-        while(i < max) {
-            result = $query.call(selector, this[i]);
-            if(result) {
+        // switch on first character so we only ever do one regex exec
+        var i = 0,
+            max = this.length,
+            result, match, queryfn;
+        switch (selector[0]) {
+        case '#':
+            match = idSelectorRE.exec(selector);
+            if (match) {
+                selector = match[0];
+                queryfn = getElementById;
+            }
+            break;
+        case '.':
+            match = classSelectorRE.exec(selector);
+            if (match) {
+                selector = match[0];
+                queryfn = getElementByClassName;
+            }
+            break;
+        }
+        if (!queryfn) {
+            queryfn = getElementByQuery;
+        }
+
+        while (i < max) {
+            result = queryfn(selector, this[i]);
+            if (result) {
                 return mauve(arr(result));
             }
             i += 1;
@@ -401,10 +454,33 @@ window['$'] = (function() {
     };
 
     mauvefn.find = function(selector) {
+        // switch on first character so we only ever do one regex exec
+        var i = 0,
+            max = this.length,
+            result, match, queryfn;
+        switch (selector[0]) {
+        case '#':
+            match = idSelectorRE.exec(selector);
+            if (match) {
+                selector = match[0];
+                queryfn = $getElementsById;
+            }
+            break;
+        case '.':
+            match = classSelectorRE.exec(selector);
+            if (match) {
+                selector = match[0];
+                queryfn = $getElementsByClassName;
+            }
+            break;
+        }
+        if (!queryfn) {
+            queryfn = $getElementsByQuery;
+        }
         if (this.length === 1) {
-            return mauve(arr($queryAll.call(selector, this[0])));
+            return mauve(queryfn.call(selector, this[0]));
         } else {
-            return mauve(this.map($queryAll, selector).reduce($concat).filter($uniq));
+            return mauve(this.map(queryfn, selector).reduce($concat).filter($uniq));
         }
     };
 
@@ -608,7 +684,7 @@ window['$'] = (function() {
     };
 
     mauvefn.eq = function(index) {
-        if(this.length) {
+        if (this.length) {
             if (index >= 0) {
                 return mauve(arr(this[index] || this[index % this.length]));
             } else if (index < 0) {
@@ -781,7 +857,7 @@ window['$'] = (function() {
                 // $.query('.bar', [mauve]) is the same as [mauve].find('.bar')
                 return mauve(context.filter($fromUnknown)).findFirst(query);
             } else if (context instanceof NodeList) {
-                return mauve(slice.call(context).filter($nodeType)).find(query);
+                return mauve(slice.call(context).filter($nodeType)).findFirst(query);
             } else if (context instanceof Node && documentNodeTypes.indexOf(context.nodeType) !== -1) {
                 return mauve(arr(qs(query, context)));
             } else {
