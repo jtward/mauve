@@ -102,15 +102,6 @@ window['$'] = (function() {
             return el[matchesSelector] ? el[matchesSelector](this) : false;
         };
 
-    /**
-     * $hasClass filter out nodes which do not have the CSS class provided in this
-     */
-    var $hasClass = divNode.classList ?
-    function(el) {
-        return el.classList.contains(this);
-    } : function(el) {
-        return el.className.split(' ').indexOf(this) !== -1;
-    };
 
     /**
      * $fromUnknown apply all the filters!
@@ -407,6 +398,13 @@ window['$'] = (function() {
     var $getElementsByQuery = function(el) {
             return slice.call(el.querySelectorAll(this));
         };
+        
+    var hasClass = divNode.classList ?
+    function(el, className) {
+        return el.classList.contains(className);
+    } : function(el) {
+        return el.className.split(' ').indexOf(className) !== -1;
+    };
 
     var mauve = function(arr) {
             // mauve is a sublcass of Array.
@@ -568,7 +566,7 @@ window['$'] = (function() {
     };
 
     mauvefn.hasClass = function(c) {
-        return this.map($hasClass, c);
+        return this[0] ? hasClass(this[0], c) : false;
     };
 
     mauvefn.attr = function(name, value) {
