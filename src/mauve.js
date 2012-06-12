@@ -8,6 +8,9 @@
 window['$'] = (function() {
     'use strict';
     var document = window.document;
+    var NodeList = window.NodeList;
+    var HTMLCollection = window.HTMLCollection;
+    var NamedNodeMap = window.NamedNodeMap;
     var arr = Array;
     var emptyArray = [];
     var slice = emptyArray.slice;
@@ -30,12 +33,12 @@ window['$'] = (function() {
     }];
     var cssBoxSizings = {
         'content-box': 1,
+        // padding-box is gecko-only and endangered =(
         'padding-box': 2,
-        /* gecko-only and endangered =( */
         'border-box': 3
     };
     var boxSizingPropertyName;
-    var bsn = ['-webkit-box-sizing', '-moz-box-sizing', 'box-sizing'];
+    var bsn = ["-webkit-box-sizing", "-moz-box-sizing", "box-sizing"];
     var bsi = bsn.length;
     while (bsi--) {
         boxSizingPropertyName = divStyle.getPropertyValue(bsn[bsi]);
@@ -411,7 +414,7 @@ window['$'] = (function() {
     var hasClass = divNode.classList ?
     function(el, className) {
         return el.classList.contains(className);
-    } : function(el) {
+    } : function(el, className) {
         return el.className.split(' ').indexOf(className) !== -1;
     };
 
@@ -532,7 +535,7 @@ window['$'] = (function() {
                 this.forEach(withNode, stuff);
             } else if (stuff instanceof arr) {
                 this.forEach(withNodes, stuff);
-            } else if (context instanceof NodeList || context instanceof HTMLCollection || context instanceof NamedNodeMap) {
+            } else if (stuff instanceof NodeList || stuff instanceof HTMLCollection || stuff instanceof NamedNodeMap) {
                 stuff = slice.call(stuff, 0);
                 this.forEach(withNodes, stuff);
             }
