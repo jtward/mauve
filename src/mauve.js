@@ -15,11 +15,12 @@ window['$'] = (function() {
     var documentReadyStates = ['complete', 'loaded', 'interactive'];
     var documentNodeTypes = [1, 9, 11];
     var divNode = document.createElement('div');
+    var divStyle = getComputedStyle(divNode);
     var fragmentDivNode = divNode.cloneNode(false);
     var cssDimensions = [{
         value: 'BOXSIZING'
     }, {
-        value: 'INNER'
+        value: 'CONTENT'
     }, {
         value: 'PADDING'
     }, {
@@ -27,6 +28,22 @@ window['$'] = (function() {
     }, {
         value: 'MARGIN'
     }];
+    var cssBoxSizings = {
+        'content-box': 1,
+        'padding-box': 2,
+        /* gecko-only and endangered =( */
+        'border-box': 3
+    };
+    var boxSizingPropertyName;
+    var bsn = ['-webkit-box-sizing', '-moz-box-sizing', 'box-sizing'];
+    var bsi = bsn.length;
+    while (bsi--) {
+        boxSizingPropertyName = divStyle.getPropertyValue(bsn[bsi]);
+        if (typeof(boxSizingPropertyName) === 'string') {
+            boxSizingPropertyName = bsn[bsi];
+        }
+        break;
+    }
     var matchesSelector = '';
     var msn = ["msMatchesSelector", "oMatchesSelector", "mozMatchesSelector", "webkitMatchesSelector", "matchesSelector"];
     var msi = msn.length;
@@ -378,34 +395,26 @@ window['$'] = (function() {
             return context.querySelector(selector);
         };
 
-    /**
-     * GetElement(s)By{x}
-     * For singular, return a Node
-     * For multiple, return a plain array
-     */
     var getElementById = function(selector, context) {
             return context.getElementById(selector);
-        };
-    var $getElementsById = function(el) {
-            return arr(el.getElementById(this));
         };
     var getElementByClassName = function(selector, context) {
             return context.getElementsByClassName(selector)[0];
         };
-    var $getElementsByClassName = function(el) {
-            return slice.call(el.getElementsByClassName(this));
+    var getElementsByClassName = function(selector, context) {
+            return context.getElementsByClassName(selector);
         };
     var getElementByTagName = function(selector, context) {
             return context.getElementsByTagName(selector)[0];
         };
-    var $getElementsByTagName = function(el) {
-            return slice.call(el.getElementsByTagName(this));
+    var getElementsByTagName = function(selector, context) {
+            return context.getElementsByTagName(selector);
         };
     var getElementByQuery = function(selector, context) {
             return context.querySelector(selector);
         };
-    var $getElementsByQuery = function(el) {
-            return slice.call(el.querySelectorAll(this));
+    var getElementsByQuery = function(selector, context) {
+            return context.querySelectorAll(selector);
         };
 
     var mauve = function(arr) {
@@ -419,32 +428,31 @@ window['$'] = (function() {
     var mauvefn = mauve.prototype;
 
     mauvefn.findFirst = function(selector) {
-        // switch on first character so we only ever do one regex exec
         var i = 0,
             max = this.length,
             result, match, queryfn;
-        switch (selector[0]) {
-        case '#':
-            match = idSelectorRE.exec(selector);
+        match = idSelectorRE.exec(selector);
+        if (match) {
+            match = match[1];
+            queryfn = getElementById;
+        } else {
+            match = classSelectorRE.test(selector);
             if (match) {
-                selector = match[0];
-                queryfn = getElementById;
-            }
-            break;
-        case '.':
-            match = classSelectorRE.exec(selector);
-            if (match) {
-                selector = match[0];
+                match = match[1];
                 queryfn = getElementByClassName;
+            } else {
+                match = tagSelectorRE.test(selector);
+                if (match) {
+                    match = match[0];
+                    queryfn = getElementByTagName;
+                } else {
+                    match = selector;
+                    queryfn = getElementByQuery;
+                }
             }
-            break;
         }
-        if (!queryfn) {
-            queryfn = getElementByQuery;
-        }
-
         while (i < max) {
-            result = queryfn(selector, this[i]);
+            result = queryfn(match, this[i]);
             if (result) {
                 return mauve(arr(result));
             }
@@ -454,33 +462,10 @@ window['$'] = (function() {
     };
 
     mauvefn.find = function(selector) {
-        // switch on first character so we only ever do one regex exec
-        var i = 0,
-            max = this.length,
-            result, match, queryfn;
-        switch (selector[0]) {
-        case '#':
-            match = idSelectorRE.exec(selector);
-            if (match) {
-                selector = match[0];
-                queryfn = $getElementsById;
-            }
-            break;
-        case '.':
-            match = classSelectorRE.exec(selector);
-            if (match) {
-                selector = match[0];
-                queryfn = $getElementsByClassName;
-            }
-            break;
-        }
-        if (!queryfn) {
-            queryfn = $getElementsByQuery;
-        }
         if (this.length === 1) {
-            return mauve(queryfn.call(selector, this[0]));
+            return mauve(arr($queryAll.call(selector, this[0])));
         } else {
-            return mauve(this.map(queryfn, selector).reduce($concat).filter($uniq));
+            return mauve(this.map($queryAll, selector).reduce($concat).filter($uniq));
         }
     };
 
@@ -727,17 +712,16 @@ window['$'] = (function() {
                 style = getComputedStyle(node);
                 dimIndex = cssDimensions.indexOf(value);
                 if (dimIndex <= 0) {
-                    result = parseFloat(style.getPropertyValue('width'));
-                } else {
-                    result = style.offsetWidth;
-                    if (dimIndex <= 2) {
-                        result -= (parseFloat(style.getPropertyValue('padding-left')) + parseFloat(style.getPropertyValue('padding-right')));
-                    }
-                    if (dimIndex === 4) {
-                        result += (parseFloat(style.getPropertyValue('margin-left')) + parseFloat(style.getPropertyValue('margin-right')));
-                    } else {
-                        result -= (parseFloat(style.getPropertyValue('border-left-width')) + parseFloat(style.getPropertyValue('border-right-width')));
-                    }
+                    dimIndex = cssBoxSizings[style.getPropertyValue(boxSizingPropertyName)];
+                }
+                result = style.offsetWidth;
+                if (dimIndex === 1) {
+                    result -= (parseFloat(style.getPropertyValue('padding-left')) + parseFloat(style.getPropertyValue('padding-right')));
+                }
+                if (dimIndex === 4) {
+                    result += (parseFloat(style.getPropertyValue('margin-left')) + parseFloat(style.getPropertyValue('margin-right')));
+                } else if (dimIndex < 3) {
+                    result -= (parseFloat(style.getPropertyValue('border-left-width')) + parseFloat(style.getPropertyValue('border-right-width')));
                 }
                 return isNaN(result) ? null : result;
             } else {
@@ -760,17 +744,16 @@ window['$'] = (function() {
                 style = getComputedStyle(node);
                 dimIndex = cssDimensions.indexOf(value);
                 if (dimIndex <= 0) {
-                    result = parseFloat(style.getPropertyValue('height'));
-                } else {
-                    result = style.offsetHeight;
-                    if (dimIndex <= 2) {
-                        result -= (parseFloat(style.getPropertyValue('padding-top')) + parseFloat(style.getPropertyValue('padding-bottom')));
-                    }
-                    if (dimIndex === 4) {
-                        result += (parseFloat(style.getPropertyValue('margin-top')) + parseFloat(style.getPropertyValue('margin-bottom')));
-                    } else {
-                        result -= (parseFloat(style.getPropertyValue('border-top-width')) + parseFloat(style.getPropertyValue('border-bottom-width')));
-                    }
+                    dimIndex = cssBoxSizings[style.getPropertyValue(boxSizingPropertyName)];
+                }
+                result = node.offsetHeight;
+                if (dimIndex === 1) {
+                    result -= (parseFloat(style.getPropertyValue('padding-top')) + parseFloat(style.getPropertyValue('padding-bottom')));
+                }
+                if (dimIndex === 4) {
+                    result += (parseFloat(style.getPropertyValue('margin-top')) + parseFloat(style.getPropertyValue('margin-bottom')));
+                } else if (dimIndex < 3) {
+                    result -= (parseFloat(style.getPropertyValue('border-top-width')) + parseFloat(style.getPropertyValue('border-bottom-width')));
                 }
                 return isNaN(result) ? null : result;
             } else {
@@ -887,7 +870,7 @@ window['$'] = (function() {
 
     $.dimensions = {
         'BOXSIZING': cssDimensions[0],
-        'INNER': cssDimensions[1],
+        'CONTENT': cssDimensions[1],
         'PADDING': cssDimensions[2],
         'BORDER': cssDimensions[3],
         'MARGIN': cssDimensions[4]
