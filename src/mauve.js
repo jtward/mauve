@@ -418,15 +418,48 @@ window['$'] = (function() {
         return el.className.split(' ').indexOf(className) !== -1;
     };
 
+
+
+    var $ = function(query, context) {
+            if (typeof(query) === 'string') {
+                if (fragmentRE.test(query)) {
+                    return $.fragment(query);
+                } else {
+                    return $.queryAll(query, context);
+                }
+            } else if (query instanceof mauve) {
+                return query;
+            } else if (query instanceof arr) {
+                return mauve(query.filter($fromUnknown));
+            } else if (context instanceof NodeList || context instanceof HTMLCollection || context instanceof NamedNodeMap) {
+                return mauve(slice.call(query).filter($nodeType));
+            } else if (query instanceof Node && documentNodeTypes.indexOf(query.nodeType) !== -1) {
+                return mauve(arr(query));
+            } else if (typeof(query) === 'function') {
+                if (documentReadyStates.indexOf(document.readyState) !== -1) {
+                    query($);
+                } else {
+                    document.addEventListener('DOMContentLoaded', function() {
+                        query($);
+                    }, false);
+                }
+                return this;
+            } else if (query === window) {
+                return mauve(arr(query));
+            } else {
+                return mauve(arr());
+            }
+        };
+
     var mauve = function(arr) {
             // mauve is a sublcass of Array.
             // this is the way to do it iff we can write to __proto__; no copying required!
-            arr.__proto__ = mauve.prototype;
+            arr.__proto__ = $.prototype;
             return arr;
         };
-    mauve.prototype = Object.create(arr.prototype);
+    $.prototype = Object.create(arr.prototype);
 
-    var mauvefn = mauve.prototype;
+    var mauvefn = $.prototype;
 
     mauvefn.findFirst = function(selector) {
         var i = 0,
@@ -774,37 +807,6 @@ window['$'] = (function() {
         this.forEach($show);
         return this;
     };
-
-    var $ = function(query, context) {
-            if (typeof(query) === 'string') {
-                if (fragmentRE.test(query)) {
-                    return $.fragment(query);
-                } else {
-                    return $.queryAll(query, context);
-                }
-            } else if (query instanceof mauve) {
-                return query;
-            } else if (query instanceof arr) {
-                return mauve(query.filter($fromUnknown));
-            } else if (context instanceof NodeList || context instanceof HTMLCollection || context instanceof NamedNodeMap) {
-                return mauve(slice.call(query).filter($nodeType));
-            } else if (query instanceof Node && documentNodeTypes.indexOf(query.nodeType) !== -1) {
-                return mauve(arr(query));
-            } else if (typeof(query) === 'function') {
-                if (documentReadyStates.indexOf(document.readyState) !== -1) {
-                    query($);
-                } else {
-                    document.addEventListener('DOMContentLoaded', function() {
-                        query($);
-                    }, false);
-                }
-                return this;
-            } else if (query === window) {
-                return mauve(arr(query));
-            } else {
-                return mauve(arr());
-            }
-        };
 
     $.queryAll = function(query, context) {
         if (context) {
