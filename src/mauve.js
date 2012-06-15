@@ -72,6 +72,46 @@ window['$'] = (function() {
         };
 
     /**
+     * xB3Qmc2l0rKZX8zNceoJ
+     * dUypXdpQlcnfvy1UhhT7
+     */
+    var uniqueTag = 'xB3Qmc2l0rKZX8zNceoJ';
+    var unique = function(array) {
+            var tagged = arr(),
+                count = 0,
+                i = array.length,
+                item;
+
+            while (i--) {
+                item = array[i];
+                if (item && !item.hasOwnProperty(uniqueTag)) {
+                    item[uniqueTag] = count;
+                    tagged[count++] = item;
+                }
+            }
+
+            // remove the tags
+            i = tagged.length;
+            while (i--) {
+                delete tagged[i][uniqueTag];
+            }
+
+            return tagged;
+        };
+
+    var struniq = function() {
+
+            return function(array) {
+                var hash = {},
+                    i = array.length;
+                while (i--) {
+                    hash[array[i]] = true;
+                }
+                return Object.keys(hash);
+            };
+        }();
+
+    /**
      * The following functions are used by passing them in as parameters to map, forEach, filter etc.
      */
     /**
@@ -85,20 +125,6 @@ window['$'] = (function() {
      */
     var $truthy = function(el) {
             return el;
-        };
-
-    /**
-     * $uniq filter out duplicates
-     */
-    var $uniq = function(el, idx, array) {
-            return array.indexOf(el) === idx;
-        };
-
-    /**
-     * $truthyAndUniq filter out falsy and duplicate values
-     */
-    var $truthyAndUniq = function(el, idx, array) {
-            return el && array.indexOf(el) === idx;
         };
 
     /**
@@ -127,7 +153,7 @@ window['$'] = (function() {
      * $fromUnknown apply all the filters!
      */
     var $fromUnknown = function(el, idx, array) {
-            return typeof el === 'object' && documentNodeTypes.indexOf(el.nodeType) !== -1 && array.indexOf(el) === idx;
+            return el instanceof Node && documentNodeTypes.indexOf(el.nodeType) !== -1;
         };
 
     /**
@@ -248,7 +274,7 @@ window['$'] = (function() {
         }
     } : function(el) {
         // TODO IF Android < 3 support is not required, just use classList
-        el.className = (el.className + ' ' + this).split(' ').filter($uniq).join(' ');
+        el.className = (struniq(el.className + ' ' + this).split(' ')).join(' ');
     };
 
 
@@ -499,12 +525,12 @@ window['$'] = (function() {
         if (this.length === 1) {
             return mauve(arr($queryAll.call(selector, this[0])));
         } else {
-            return mauve(this.map($queryAll, selector).reduce($concat).filter($uniq));
+            return mauve(unique(this.map($queryAll, selector).reduce($concat)));
         }
     };
 
     mauvefn.add = function(selector, context) {
-        return mauve(this.concat($(selector, context)).filter($uniq));
+        return mauve(unique(this.concat($(selector, context))));
     };
 
     mauvefn.remove = function() {
@@ -653,19 +679,19 @@ window['$'] = (function() {
     };
 
     mauvefn.parent = function() {
-        return mauve(this.map($parent).filter($uniq));
+        return mauve(unique(this.map($parent)));
     };
 
     mauvefn.parents = function() {
-        return mauve(this.map($parents).reduce($concat).filter($uniq));
+        return mauve(unique(this.map($parents).reduce($concat)));
     };
 
     mauvefn.prev = function(selector) {
-        return mauve(this.map($prev, selector).filter($truthyAndUniq));
+        return mauve(unique(this.map($prev, selector)));
     };
 
     mauvefn.next = function(selector) {
-        return mauve(this.map($next, selector).filter($truthyAndUniq));
+        return mauve(unique(this.map($next, selector)));
     };
 
     mauvefn.clone = function() {
