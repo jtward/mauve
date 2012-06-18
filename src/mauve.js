@@ -99,17 +99,30 @@ window['$'] = (function() {
             return tagged;
         };
 
-    var struniq = function() {
+    var struniq = function(array) {
+            var hash = {},
+                i = array.length;
+            while (i--) {
+                hash[array[i]] = true;
+            }
+            return Object.keys(hash);
+        };
 
-            return function(array) {
-                var hash = {},
-                    i = array.length;
-                while (i--) {
-                    hash[array[i]] = true;
+    //taken from https://github.com/insin/DOMBuilder/blob/master/lib/DOMBuilder.js
+    var flatten = function(arr) {
+            for (var i = 0, l = arr.length, current; i < l; i++) {
+                current = arr[i];
+                if (Array.isArray(current)) {
+                    // Make sure we loop to the Array's new length
+                    l += current.length - 1;
+                    // Replace the current item with its contents
+                    splice.apply(arr, [i, 1].concat(current));
+                    //don't do i-- because we're only doing one-level of flattening
                 }
-                return Object.keys(hash);
-            };
-        }();
+            }
+            // We flattened in-place, but return for chaining
+            return arr;
+        };
 
     /**
      * The following functions are used by passing them in as parameters to map, forEach, filter etc.
@@ -154,17 +167,6 @@ window['$'] = (function() {
      */
     var $fromUnknown = function(el, idx, array) {
             return el instanceof Node && documentNodeTypes.indexOf(el.nodeType) !== -1;
-        };
-
-    /**
-     * reduce functions
-     * @param {Array} a the left array
-     * @param {Array} b thr right array
-     * @return {Array} the array resulting from reducing a and b
-     */
-    /* reductions: return a plain array */
-    var $concat = function(a, b) {
-            return a.concat(b);
         };
 
     /**
@@ -525,7 +527,7 @@ window['$'] = (function() {
         if (this.length === 1) {
             return mauve(arr($queryAll.call(selector, this[0])));
         } else {
-            return mauve(unique(this.map($queryAll, selector).reduce($concat)));
+            return mauve(unique(flatten(this.map($queryAll, selector))));
         }
     };
 
@@ -670,11 +672,11 @@ window['$'] = (function() {
     };
 
     mauvefn.children = function() {
-        return mauve(this.map($children).reduce($concat).filter($nodeType));
+        return mauve(flatten(this.map($children)).filter($nodeType));
     };
 
     mauvefn.siblings = function(selector) {
-        var result = this.map($siblings).reduce($concat).filter($nodeTypeAndExcept, this);
+        var result = flatten(this.map($siblings)).filter($nodeTypeAndExcept, this);
         return mauve((typeof(selector) === 'string') ? result.filter($matchesSelector, selector) : result);
     };
 
@@ -683,7 +685,7 @@ window['$'] = (function() {
     };
 
     mauvefn.parents = function() {
-        return mauve(unique(this.map($parents).reduce($concat)));
+        return mauve(unique(flatten(this.map($parents))));
     };
 
     mauvefn.prev = function(selector) {
