@@ -174,7 +174,7 @@ Return the computed value for the height of the first element in this mauve arra
 
 If no value is given or the value is `$.dimensions.BOXSIZING` then the height is calculated using the current box-sizing of the given element. A box-sizing of 'content-box' evaluates to `$.dimensions.CONTENT`, a box-sizing of 'padding-box' evaluates to `$.dimensions.PADDING` and a box-sizing of 'border-box' evaluates to `$.dimensions.BORDER`. Note that there is no 'margin-box' and 'padding-box' is only available in Gecko and is currently under review.
 
-If the value is `$.dimensions.CONTENT` then the returned value is the height of the content box of the given element. 
+If the value is `$.dimensions.CONTENT` then the returned value is the height of the content box of the given element.
 
 If the value is `$.dimensions.PADDING` then the returned value is the height of the padding box of the given element.
 
@@ -182,6 +182,25 @@ If the value is `$.dimensions.BORDER` then the returned value is the height of t
 
 If the value is `$.dimensions.MARGIN` then the returned value is the height of the margin box of the given element.
 
+###$.fn.hide
+`$(...).hide() => this`
+
+Sets the value of the `display` CSS property to `none` for each element in this mauve array.
+
+###$.fn.is
+`$(...).is(selector) => this`
+
+Return true if the first element in this mauve array matches the given selector, false otherwise.
+
+###$.fn.next
+`$(...).next() => mauve array`
+
+Return an mauve array of the the next siblings of the elements in this mauve array. If an element does not have a next sibling it is not included in the returned array.
+
+###$.fn.parent
+`$(...).parent() => mauve array`
+
+Return an mauve array of the the immediate parents of the elements in this mauve array. If an element does not have a direct parent it is not included in the returned array.
 
 #Supported Browsers
 
