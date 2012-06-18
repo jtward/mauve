@@ -702,7 +702,10 @@ window['$'] = (function() {
 
     mauvefn.is = function(selector) {
         var node = this[0];
-        return node && (node[matchesSelector] ? node[matchesSelector](selector) : false);
+        if(node) {
+            return node[matchesSelector] ? node[matchesSelector](selector) : false;
+        }
+        return false;
     };
 
     mauvefn.closest = function(selector, context) {
