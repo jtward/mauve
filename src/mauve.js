@@ -525,7 +525,7 @@ window['$'] = (function() {
 
     mauvefn.find = function(selector) {
         if (this.length === 1) {
-            return mauve(arr($queryAll.call(selector, this[0])));
+            return mauve(slice.call($queryAll.call(selector, this[0])));
         } else {
             return mauve(unique(flatten(this.map($queryAll, selector))));
         }
