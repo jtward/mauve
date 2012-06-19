@@ -458,7 +458,7 @@ window['$'] = (function() {
             } else if (query instanceof mauve) {
                 return query;
             } else if (query instanceof arr) {
-                return mauve(query.filter($fromUnknown));
+                return mauve(unique(query.filter($fromUnknown)));
             } else if (context instanceof NodeList || context instanceof HTMLCollection || context instanceof NamedNodeMap) {
                 return mauve(slice.call(query).filter($nodeType));
             } else if (query instanceof Node && documentNodeTypes.indexOf(query.nodeType) !== -1) {
@@ -849,7 +849,7 @@ window['$'] = (function() {
                 return context.find(query);
             } else if (context instanceof arr) {
                 // $.query('.bar', [array]) is the same as mauve([array]).find('.bar')
-                return mauve(context.filter($fromUnknown)).find(query);
+                return mauve(unique(context.filter($fromUnknown))).find(query);
             } else if (context instanceof NodeList || context instanceof HTMLCollection || context instanceof NamedNodeMap) {
                 return mauve(slice.call(context).filter($nodeType)).find(query);
             } else if (context instanceof Node && documentNodeTypes.indexOf(context.nodeType) !== -1) {
@@ -872,7 +872,7 @@ window['$'] = (function() {
                 return context.findFirst(query);
             } else if (context instanceof arr) {
                 // $.query('.bar', [mauve]) is the same as [mauve].find('.bar')
-                return mauve(context.filter($fromUnknown)).findFirst(query);
+                return mauve(unique(context.filter($fromUnknown))).findFirst(query);
             } else if (context instanceof NodeList || context instanceof HTMLCollection || context instanceof NamedNodeMap) {
                 return mauve(slice.call(context).filter($nodeType)).findFirst(query);
             } else if (context instanceof Node && documentNodeTypes.indexOf(context.nodeType) !== -1) {
