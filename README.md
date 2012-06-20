@@ -86,6 +86,8 @@ Append the given node as the last child of all of the nodes in this mauve array.
 Append the given nodes as the last children of all of the nodes in this mauve array.
 
 ###$.fn.attr
+Use `prop` instead of this function when reading DOM properties that change over time such as `checked` and `selected`.
+
 `$(...).attr(attribute) => value`
 
 Return the value of the given attribute from the first node in this mauve array.
@@ -201,6 +203,41 @@ Return an mauve array of the the next siblings of the elements in this mauve arr
 `$(...).parent() => mauve array`
 
 Return an mauve array of the the immediate parents of the elements in this mauve array. If an element does not have a direct parent it is not included in the returned array.
+
+###$.fn.parents
+`$(...).parents() => mauve array`
+
+Return a mauve array of all of the parents of the elements in this mauve array obtained by walking up the DOM tree.
+
+###$.fn.prepend
+`$(...).prepend(html) => this`
+
+Prepend the given HTML string to the innerHTML of all of the nodes in this mauve array.
+
+`$(...).prepend(Node) => this`
+
+Prepend the given node as the first child of all of the nodes in this mauve array.
+
+`$(...).prepend(Node[] | NodeList) => this`
+
+Prepend the given nodes as the first children of all of the nodes in this mauve array.
+
+###$.fn.prev
+`$(...).prev() => mauve array`
+
+Return an mauve array of the the previous siblings of the elements in this mauve array. If an element does not have a previous sibling it is not included in the returned array.
+
+###$.fn.prop
+Use this function over `attr` when reading DOM properties that change over time such as `checked` and `selected`.
+
+`$(...).prop(property) => value`
+
+Return the value of the given property from the first node in this mauve array.
+
+`$(...).prop(property, value) => this`
+
+Set the value of the given property to the given value for all of the nodes in this mauve array.
+
 
 #Supported Browsers
 
