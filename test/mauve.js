@@ -52,3 +52,26 @@ QUnit.test('$("body", "body")', function() {
     var w = $("body", "body");
     ok(w instanceof $ && w.length === 0);
 });
+
+/* create a fragment */
+QUnit.test('$("<div/>")', function() {
+    var m = $('<div/>');
+    ok(m instanceof $ && m.length === 1 && m[0].outerHTML === '<div></div>');
+});
+
+QUnit.test('$($())', function() {
+    var m = $($());
+    ok(m instanceof $ && m.length === 0);
+});
+QUnit.test('$($(document))', function() {
+    var m = $($(document));
+    ok(m instanceof $ && m.length === 1 && m[0] === document);
+});
+QUnit.test('$([])', function() {
+    var m = $([]);
+    ok(m instanceof $ && m.length === 0);
+});
+QUnit.test('$([document])', function() {
+    var m = $([document]);
+    ok(m instanceof $ && m.length === 1 && m[0] === document);
+});
