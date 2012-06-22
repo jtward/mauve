@@ -11,12 +11,13 @@ window['$'] = (function() {
     var NodeList = window.NodeList;
     var HTMLCollection = window.HTMLCollection;
     var NamedNodeMap = window.NamedNodeMap;
+    var getComputedStyle = window.getComputedStyle;
     var arr = Array;
     var emptyArray = [];
     var slice = emptyArray.slice;
     var splice = emptyArray.splice;
     var documentReadyStates = ['complete', 'loaded', 'interactive'];
-    var documentNodeTypes = [1, 9, 11];
+    var documentNodeTypes = [1, 9, 11]; //mauve only allows elements, document and documentFragments.
     var divNode = document.createElement('div');
     var divStyle = getComputedStyle(divNode);
     var fragmentDivNode = divNode.cloneNode(false);
@@ -459,7 +460,9 @@ window['$'] = (function() {
                 return query;
             } else if (query instanceof arr) {
                 return mauve(unique(query.filter($fromUnknown)));
-            } else if (context instanceof NodeList || context instanceof HTMLCollection || context instanceof NamedNodeMap) {
+            } else if(query instanceof HTMLCollection) {
+                return mauve(slice.call(query));
+            } else if (query instanceof NodeList || query instanceof NamedNodeMap) {
                 return mauve(slice.call(query).filter($nodeType));
             } else if (query instanceof Node && documentNodeTypes.indexOf(query.nodeType) !== -1) {
                 return mauve(arr(query));
@@ -850,7 +853,9 @@ window['$'] = (function() {
             } else if (context instanceof arr) {
                 // $.query('.bar', [array]) is the same as mauve([array]).find('.bar')
                 return mauve(unique(context.filter($fromUnknown))).find(query);
-            } else if (context instanceof NodeList || context instanceof HTMLCollection || context instanceof NamedNodeMap) {
+            } else if(context instanceof HTMLCollection) {
+                return mauve(slice.call(context)).find(query);
+            } else if (context instanceof NodeList || context instanceof NamedNodeMap) {
                 return mauve(slice.call(context).filter($nodeType)).find(query);
             } else if (context instanceof Node && documentNodeTypes.indexOf(context.nodeType) !== -1) {
                 return mauve(qsa(query, context));
@@ -873,7 +878,9 @@ window['$'] = (function() {
             } else if (context instanceof arr) {
                 // $.query('.bar', [mauve]) is the same as [mauve].find('.bar')
                 return mauve(unique(context.filter($fromUnknown))).findFirst(query);
-            } else if (context instanceof NodeList || context instanceof HTMLCollection || context instanceof NamedNodeMap) {
+            } else if (context instanceof HTMLCollection) {
+                return mauve(slice.call(context)).findFirst(query);
+            } else if (context instanceof NodeList || context instanceof NamedNodeMap) {
                 return mauve(slice.call(context).filter($nodeType)).findFirst(query);
             } else if (context instanceof Node && documentNodeTypes.indexOf(context.nodeType) !== -1) {
                 return mauve(arr(qs(query, context)));
