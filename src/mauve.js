@@ -7,11 +7,11 @@
 /*global Node:false*/
 window['$'] = (function() {
     'use strict';
+    var win = window;
     var document = window.document;
     var NodeList = window.NodeList;
     var HTMLCollection = window.HTMLCollection;
     var NamedNodeMap = window.NamedNodeMap;
-    var getComputedStyle = window.getComputedStyle;
     var arr = Array;
     var emptyArray = [];
     var slice = emptyArray.slice;
@@ -19,7 +19,7 @@ window['$'] = (function() {
     var documentReadyStates = ['complete', 'loaded', 'interactive'];
     var documentNodeTypes = [1, 9, 11]; //mauve only allows elements, document and documentFragments.
     var divNode = document.createElement('div');
-    var divStyle = getComputedStyle(divNode);
+    var divStyle = win.getComputedStyle(divNode, null);
     var fragmentDivNode = divNode.cloneNode(false);
     var cssDimensions = [{
         value: 'BOXSIZING'
@@ -237,7 +237,7 @@ window['$'] = (function() {
      * Return the computed value of the css property this or the style value
      */
     var $getCss = function(el) {
-            return getComputedStyle(el).getPropertyValue(this) || el.style[camelize(this)];
+            return win.getComputedStyle(el, null).getPropertyValue(this) || el.style[camelize(this)];
         };
 
     /* foreaches: modify; no return value */
@@ -777,7 +777,7 @@ window['$'] = (function() {
             } else if (node === document) {
                 return Math.max(document.documentElement.offsetWidth, document.documentElement.scrollWidth);
             } else if (node) {
-                style = getComputedStyle(node);
+                style = win.getComputedStyle(node, null);
                 dimIndex = cssDimensions.indexOf(value);
                 if (dimIndex <= 0) {
                     dimIndex = cssBoxSizings[style.getPropertyValue(boxSizingPropertyName)];
@@ -809,7 +809,7 @@ window['$'] = (function() {
             } else if (node === document) {
                 return Math.max(document.documentElement.offsetHeight, document.documentElement.scrollHeight);
             } else if (node) {
-                style = getComputedStyle(node);
+                style = win.getComputedStyle(node, null);
                 dimIndex = cssDimensions.indexOf(value);
                 if (dimIndex <= 0) {
                     dimIndex = cssBoxSizings[style.getPropertyValue(boxSizingPropertyName)];
