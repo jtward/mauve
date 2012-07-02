@@ -58,6 +58,22 @@ window['$'] = (function() {
             break;
         }
     }
+
+    // use__proto__ is true if objects have a mutable __proto__ property
+    var use__proto__ = (function() {
+        var o = {};
+        if(!o.__proto__) {
+            // no __proto__!
+            return false;
+        }
+        // a temporary function to use as a prototype
+        var p = function() {};
+        // attempt to set __proto__
+        o.__proto__ = p;
+        // return true if the overwrite was successful; false otherwise
+        return o.__proto__ === p;
+    }());
+
     var idSelectorRE = /^#([\w\-]+)$/;
     var classSelectorRE = /^\.([\w\-]+)$/;
     var tagSelectorRE = /^[\w\-]+$/;
@@ -268,6 +284,7 @@ window['$'] = (function() {
         };
 
 
+    // addClass implementation depends on support for classList
     var $addClass = divNode.classList ?
     function(el) {
         var list = this.split(' '),
@@ -277,13 +294,13 @@ window['$'] = (function() {
         }
     } : function(el) {
         // TODO IF Android < 3 support is not required, just use classList
+        // concat current className with given string -> split -> unique -> join
         el.className = (struniq(el.className + ' ' + this).split(' ')).join(' ');
     };
 
 
     var $removeClass = divNode.classList ?
     function(el) {
-
         var list = this.split(' '),
             i = list.length;
 
@@ -293,11 +310,12 @@ window['$'] = (function() {
     } : function(el) {
         // ditto addClass
         var current = el.className.split(' '),
-            torem = this.split(' '),
+            exClasses = this.split(' '),
             i = current.length;
 
+        // remove classes from current
         while (i--) {
-            if (torem.indexOf(current[i] !== -1)) {
+            if (exClasses.indexOf(current[i] !== -1)) {
                 current.splice(i, 1);
             }
         }
@@ -316,6 +334,10 @@ window['$'] = (function() {
             el.value = this;
         };
 
+    // context is an array
+    // 0: {string} property name
+    // 1: {string} property value
+    // 2: {boolean} important
     var $setCss = function(el) {
             if (this[1]) {
                 el.style.setProperty(this[0], this[1], this[2] ? 'important' : undefined);
@@ -447,8 +469,6 @@ window['$'] = (function() {
         return el.className.split(' ').indexOf(className) !== -1;
     };
 
-
-
     var $ = function(query, context) {
             if (typeof(query) === 'string') {
                 if (fragmentRE.test(query)) {
@@ -482,13 +502,33 @@ window['$'] = (function() {
             }
         };
 
-    var mauve = function(arr) {
-            // mauve is a sublcass of Array.
+    $.prototype = Object.create(arr.prototype);
+
+    var mauve;
+    if(use__proto__) {
+        mauve = function(arr) {
             // this is the way to do it iff we can write to __proto__; no copying required!
             arr.__proto__ = $.prototype;
             return arr;
         };
-    $.prototype = Object.create(arr.prototype);
+    }
+    else {
+        (function() {
+            $.prototype.constructor = $;
+            // concat does not mutate so we can reuse this
+            var zeroes2 = [0, 0];
+            // constructor; make self a copy of the given array by splicing in
+            var Init = function(arr) {
+                splice.apply(this, zeroes2.concat(arr));
+            };
+            // we want $'s prototype for new mauve arrays
+            Init.prototype = $.prototype;
+            // mauve is a wrapper around Init because we need to use new.
+            mauve = function(arr) {
+                return new Init(arr);
+            };
+        }());
+    }
 
     var mauvefn = $.prototype;
 
