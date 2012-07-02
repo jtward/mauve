@@ -339,8 +339,10 @@ window['$'] = (function() {
     // 1: {string} property value
     // 2: {boolean} important
     var $setCss = function(el) {
-            if (this[1]) {
-                el.style.setProperty(this[0], this[1], this[2] ? 'important' : undefined);
+            var value = this[1];
+            // can't use double-equality here because empty string should not pass the test but zero should
+            if (value || value === 0) {
+                el.style.setProperty(this[0], value, this[2] ? 'important' : undefined);
             } else {
                 el.style.removeProperty(this[0]);
             }
