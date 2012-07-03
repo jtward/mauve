@@ -11,6 +11,7 @@ window['$'] = (function() {
     var document = window.document;
     var NodeList = window.NodeList;
     var HTMLCollection = window.HTMLCollection;
+    var HTMLAllCollection = window.HTMLAllCollection;
     var NamedNodeMap = window.NamedNodeMap;
     var arr = Array;
     var emptyArray = [];
@@ -482,7 +483,7 @@ window['$'] = (function() {
                 return query;
             } else if (query instanceof arr) {
                 return mauve(unique(query.filter($fromUnknown)));
-            } else if(query instanceof HTMLCollection) {
+            } else if(query instanceof HTMLCollection || query instanceof HTMLAllCollection) {
                 return mauve(slice.call(query));
             } else if (query instanceof NodeList || query instanceof NamedNodeMap) {
                 return mauve(slice.call(query).filter($nodeType));
@@ -641,7 +642,7 @@ window['$'] = (function() {
                 this.forEach(withNode, stuff);
             } else if (stuff instanceof arr) {
                 this.forEach(withNodes, stuff);
-            } else if (stuff instanceof NodeList || stuff instanceof HTMLCollection || stuff instanceof NamedNodeMap) {
+            } else if (stuff instanceof NodeList || stuff instanceof HTMLCollection || stuff instanceof HTMLAllCollection || stuff instanceof NamedNodeMap) {
                 stuff = slice.call(stuff, 0);
                 this.forEach(withNodes, stuff);
             }
@@ -761,7 +762,7 @@ window['$'] = (function() {
             context = context[0];
         } else if (context instanceof arr) {
             context = context.filter($fromUnknown)[0];
-        } else if (context instanceof NodeList || context instanceof HTMLCollection || context instanceof NamedNodeMap) {
+        } else if (context instanceof NodeList || context instanceof HTMLCollection || context instanceof HTMLCollection || context instanceof NamedNodeMap) {
             context = slice.call(context, 0).filter($nodeType)[0];
         }
         while (node && !(node[matchesSelector] ? node[matchesSelector](selector) : false)) {
@@ -895,7 +896,7 @@ window['$'] = (function() {
             } else if (context instanceof arr) {
                 // $.query('.bar', [array]) is the same as mauve([array]).find('.bar')
                 return mauve(unique(context.filter($fromUnknown))).find(query);
-            } else if(context instanceof HTMLCollection) {
+            } else if(context instanceof HTMLCollection || context instanceof HTMLAllCollection) {
                 return mauve(slice.call(context)).find(query);
             } else if (context instanceof NodeList || context instanceof NamedNodeMap) {
                 return mauve(slice.call(context).filter($nodeType)).find(query);
@@ -920,7 +921,7 @@ window['$'] = (function() {
             } else if (context instanceof arr) {
                 // $.query('.bar', [mauve]) is the same as [mauve].find('.bar')
                 return mauve(unique(context.filter($fromUnknown))).findFirst(query);
-            } else if (context instanceof HTMLCollection) {
+            } else if (context instanceof HTMLCollection || context instanceof HTMLAllCollection) {
                 return mauve(slice.call(context)).findFirst(query);
             } else if (context instanceof NodeList || context instanceof NamedNodeMap) {
                 return mauve(slice.call(context).filter($nodeType)).findFirst(query);
