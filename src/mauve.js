@@ -67,8 +67,8 @@ window['$'] = (function() {
             // no __proto__!
             return false;
         }
-        // a temporary function to use as a prototype
-        var p = function() {};
+        // a temporary function to use as a prototype; keep CC happy by returning a value
+        var p = function() {return {}};
         // attempt to set __proto__
         o.__proto__ = p;
         // return true if the overwrite was successful; false otherwise
@@ -521,6 +521,7 @@ window['$'] = (function() {
             // concat does not mutate so we can reuse this
             var zeroes2 = [0, 0];
             // constructor; make self a copy of the given array by splicing in
+            /** @constructor */
             var Init = function(arr) {
                 splice.apply(this, zeroes2.concat(arr));
             };
