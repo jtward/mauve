@@ -75,3 +75,15 @@ QUnit.test('$([document])', function() {
     var m = $([document]);
     ok(m instanceof $ && m.length === 1 && m[0] === document);
 });
+QUnit.test('$([0, 1, "", "2", null, undefined, /^.*$/])', function() {
+    var m = $([0, 1, "", "2", null, undefined, /^.*$/]);
+    ok(m instanceof $ && m.length === 0);
+});
+QUnit.test('$(document.forms)', function() {
+    var m = $(document.forms);
+    ok(m instanceof $ && m.length === 1 && m[0] === document.getElementsByTagName('form')[0]);
+});
+QUnit.test('$(document.getElementsByTagName("body"))', function() {
+    var m = $(document.getElementsByTagName("body"));
+    ok(m instanceof $ && m.length === 1 && m[0] === document.getElementsByTagName('body')[0]);
+});
