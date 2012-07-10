@@ -93,6 +93,10 @@ window['$'] = (function() {
      * xB3Qmc2l0rKZX8zNceoJ
      * dUypXdpQlcnfvy1UhhT7
      */
+     /**
+      * Unique for nodes.
+      * We do not preserve objects' xB3Qmc2l0rKZX8zNceoJ values; they are overridden and then deleted.
+      */
     var uniqueTag = 'xB3Qmc2l0rKZX8zNceoJ';
     var unique = function(array) {
             var tagged = arr(),
@@ -108,7 +112,7 @@ window['$'] = (function() {
                 }
             }
 
-            // remove the tags
+            // remove the tags (TODO: is this necessary?)
             i = tagged.length;
             while (i--) {
                 delete tagged[i][uniqueTag];
@@ -117,6 +121,9 @@ window['$'] = (function() {
             return tagged;
         };
 
+    /**
+     * Unique for strings.
+     */
     var struniq = function(array) {
             var hash = {},
                 i = array.length;
@@ -144,29 +151,26 @@ window['$'] = (function() {
 
     /**
      * The following functions are used by passing them in as parameters to map, forEach, filter etc.
-     */
-    /**
-     * filter functions
+     * @this {Anything} function-dependent
      * @param {Node} el the node to filter
-     * @param {Anything} this context; function-dependent
      * @return {Anything} truthy if the node should pass through the filter, falsy otherwise
      */
     /**
-     * $truthy filter out falsy values
+     * Return true if the given parameter is truthy
      */
     var $truthy = function(el) {
             return el;
         };
 
     /**
-     * $nodeType filter out nodes with the wrong node types
+     * Return true if the given node's nodeType is valid
      */
     var $nodeType = function(el) {
             return documentNodeTypes.indexOf(el.nodeType) !== -1;
         };
 
     /**
-     * $nodeTypeAndExcept filter out nodes with the wrong node types and nodes in this
+     * Return true if the given node's nodeType is valid and the given node is not included in the context array.
      */
     var $nodeTypeAndExcept = function(el) {
             return documentNodeTypes.indexOf(el.nodeType) !== -1 && this.indexOf(el) !== -1;
@@ -190,8 +194,8 @@ window['$'] = (function() {
     /**
      * map functions.
      * functions that return elements or arrays of elements are a bit special
+     * @this {Anything} function-dependent
      * @param {Node} el the element to map
-     * @param {Anything} this some context
      * @return {Anything} the result of mapping el
      */
     /**
