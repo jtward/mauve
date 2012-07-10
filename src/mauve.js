@@ -68,7 +68,7 @@ window['$'] = (function() {
             return false;
         }
         // a temporary function to use as a prototype; keep CC happy by returning a value
-        var p = function() {return {}};
+        var p = function() {return {};};
         // attempt to set __proto__
         o.__proto__ = p;
         // return true if the overwrite was successful; false otherwise
@@ -186,7 +186,7 @@ window['$'] = (function() {
 
 
     /**
-     * $fromUnknown apply all the filters!
+     * Return true if el is a node and has a valid nodeType
      */
     var $fromUnknown = function(el, idx, array) {
             return el instanceof Node && documentNodeTypes.indexOf(el.nodeType) !== -1;
