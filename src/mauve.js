@@ -177,10 +177,11 @@ window['$'] = (function() {
         };
 
     /**
-     * $matchesSelector filter out nodes which do not match the selector provided in this
+     * Return true if the given element is matched by the context string
+     * @this {String} A selector string
      */
     var $matchesSelector = function(el) {
-            return el[matchesSelector] ? el[matchesSelector](this) : false;
+            return el[matchesSelector](this);
         };
 
 
