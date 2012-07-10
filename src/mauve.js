@@ -157,6 +157,7 @@ window['$'] = (function() {
      */
     /**
      * Return true if the given parameter is truthy
+     * @param {Anyting} el Anything
      */
     var $truthy = function(el) {
             return el;
@@ -164,6 +165,7 @@ window['$'] = (function() {
 
     /**
      * Return true if the given node's nodeType is valid
+     * @param {Node} el The node to test
      */
     var $nodeType = function(el) {
             return documentNodeTypes.indexOf(el.nodeType) !== -1;
@@ -171,6 +173,8 @@ window['$'] = (function() {
 
     /**
      * Return true if the given node's nodeType is valid and the given node is not included in the context array.
+     * @this {Node[]} The array of nodes to test for el's inclusion
+     * @param {Node} el The node to test
      */
     var $nodeTypeAndExcept = function(el) {
             return documentNodeTypes.indexOf(el.nodeType) !== -1 && this.indexOf(el) !== -1;
@@ -179,16 +183,17 @@ window['$'] = (function() {
     /**
      * Return true if the given element is matched by the context string
      * @this {String} A selector string
+     * @param {Node} el The node to test
      */
     var $matchesSelector = function(el) {
             return el[matchesSelector](this);
         };
 
-
     /**
      * Return true if el is a node and has a valid nodeType
+     * @param {Anything} el The element to test
      */
-    var $fromUnknown = function(el, idx, array) {
+    var $fromUnknown = function(el) {
             return el instanceof Node && documentNodeTypes.indexOf(el.nodeType) !== -1;
         };
 
