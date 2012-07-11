@@ -10,8 +10,7 @@ window['$'] = (function() {
     var win = window;
     var document = window.document;
     var NodeList = window.NodeList;
-    var HTMLCollection = window.HTMLCollection;
-    /** @suppress {undefinedNames} */
+    var HTMLCollection = window.HTMLCollection; /** @suppress {undefinedNames} */
     var HTMLAllCollection = window.HTMLAllCollection;
     var NamedNodeMap = window.NamedNodeMap;
     var arr = Array;
@@ -65,12 +64,14 @@ window['$'] = (function() {
     // use__proto__ is true if objects have a mutable __proto__ property
     var use__proto__ = (function() {
         var o = {};
-        if(!o.__proto__) {
+        if (!o.__proto__) {
             // no __proto__!
             return false;
         }
         // a temporary function to use as a prototype; keep CC happy by returning a value
-        var p = function() {return {};};
+        var p = function() {
+                return {};
+            };
         // attempt to set __proto__
         o.__proto__ = p;
         // return true if the overwrite was successful; false otherwise
@@ -100,7 +101,7 @@ window['$'] = (function() {
      * xB3Qmc2l0rKZX8zNceoJ
      * dUypXdpQlcnfvy1UhhT7
      */
-     
+
     var uniqueTag = 'xB3Qmc2l0rKZX8zNceoJ';
     /**
      * Unique for nodes.
@@ -145,20 +146,25 @@ window['$'] = (function() {
             return Object.keys(hash);
         };
 
-    //taken from https://github.com/insin/DOMBuilder/blob/master/lib/DOMBuilder.js
-    var flatten = function(arr) {
-            for (var i = 0, l = arr.length, current; i < l; i++) {
-                current = arr[i];
+    /**
+     * Flatten the given array non-recursively.
+     * Taken from https://github.com/insin/DOMBuilder/blob/master/lib/DOMBuilder.js and modified slightly.
+     * @param {Array} a The array to flatten.
+     * @return {Array} The flattened array.
+     */
+    var flatten = function(a) {
+            for (var i = 0, l = a.length, current; i < l; i++) {
+                current = a[i];
                 if (Array.isArray(current)) {
                     // Make sure we loop to the Array's new length
                     l += current.length - 1;
                     // Replace the current item with its contents
-                    splice.apply(arr, [i, 1].concat(current));
+                    splice.apply(a, [i, 1].concat(current));
                     //don't do i-- because we're only doing one-level of flattening
                 }
             }
             // We flattened in-place, but return for chaining
-            return arr;
+            return a;
         };
 
     /**
@@ -168,42 +174,48 @@ window['$'] = (function() {
      * @return {boolean} truthy if the node should pass through the filter, falsy otherwise
      */
     /**
-     * Return true if the given parameter is truthy
-     * @param {*} el Anything
+     * Return truthy if the given parameter is truthy.
+     * @param {*} el Anything.
+     * @return {*} el.
      */
     var $truthy = function(el) {
+            // don't bother converting to a real boolean
             return el;
         };
 
     /**
-     * Return true if the given node's nodeType is valid
-     * @param {Node} el The node to test
+     * Return true if the given node's nodeType is valid.
+     * @param {Node} el The node to test.
+     * @return {boolean} true if the given node's nodeType is valid, false otherwise.
      */
     var $nodeType = function(el) {
             return documentNodeTypes.indexOf(el.nodeType) !== -1;
         };
 
     /**
-     * Return true if the given node's nodeType is valid and the given node is not included in the context array.
-     * @this {Array.<Node>} The array of nodes to test for el's inclusion
-     * @param {Node} el The node to test
+     * Return true if the given node's nodeType is valid and the given node is not included in the this array.
+     * @this {Array.<Node>} The array of nodes to test for el's inclusion.
+     * @param {Node} el The node to test.
+     * @return {boolean} true if the given node's nodeType is valid and the given node is not contained in the this array, false otherwise.
      */
     var $nodeTypeAndExcept = function(el) {
             return documentNodeTypes.indexOf(el.nodeType) !== -1 && this.indexOf(el) !== -1;
         };
 
     /**
-     * Return true if the given element is matched by the context string
-     * @this {String} A selector string
-     * @param {Node} el The node to test
+     * Return true if the given element is matched by the this string.
+     * @this {String} A selector string.
+     * @param {Node} el The node to test.
+     * @return {boolean} true if the given node matches the this selector, false otherwise.
      */
     var $matchesSelector = function(el) {
             return el[matchesSelector](this);
         };
 
     /**
-     * Return true if el is a node and has a valid nodeType
-     * @param {*} el The element to test
+     * Return true if el is a node and has a valid nodeType.
+     * @param {*} el The element to test.
+     * @return {boolean} true if the given element is a Node whose nodeType is valid, false otherwise.
      */
     var $fromUnknown = function(el) {
             return el instanceof Node && documentNodeTypes.indexOf(el.nodeType) !== -1;
@@ -217,14 +229,21 @@ window['$'] = (function() {
      * @return {*} the result of mapping el
      */
     /**
-     * Return an array of the descendants of el that match the query in this
+     * Return an array of the descendants of el that match the query in this.
+     * @this {string} A selector to query with.
+     * @param {Node} el The element to find matches under.
+     * @return {Array.<Node>} An array of the nodes under the given element that match the this selector.
      */
     var $queryAll = function(el) {
+            // slice to turn the returned NodeList into a plain Array.
             return slice.call(el.querySelectorAll(this), 0);
         };
 
     /**
-     * Return the first descendant of el that matches the query in this
+     * Return the first descendant of el that matches the this selector.
+     * @this {string} A selector to query with.
+     * @param {Node} el The element to find matches under.
+     * @return {Node} The first node inder the given element that matches the this selector.
      */
     var $query = function(el) {
             return el.querySelector(this);
@@ -505,7 +524,7 @@ window['$'] = (function() {
                 return query;
             } else if (query instanceof arr) {
                 return mauve(unique(query.filter($fromUnknown)));
-            } else if(query instanceof HTMLCollection || query instanceof HTMLAllCollection) {
+            } else if (query instanceof HTMLCollection || query instanceof HTMLAllCollection) {
                 return mauve(slice.call(query));
             } else if (query instanceof NodeList || query instanceof NamedNodeMap) {
                 return mauve(slice.call(query).filter($nodeType));
@@ -530,14 +549,13 @@ window['$'] = (function() {
     $.prototype = Object.create(arr.prototype);
 
     var mauve;
-    if(use__proto__) {
+    if (use__proto__) {
         mauve = function(arr) {
             // this is the way to do it iff we can write to __proto__; no copying required!
             arr.__proto__ = $.prototype;
             return arr;
         };
-    }
-    else {
+    } else {
         (function() {
             $.prototype.constructor = $;
             // concat does not mutate so we can reuse this
@@ -545,8 +563,8 @@ window['$'] = (function() {
             // constructor; make self a copy of the given array by splicing in
             /** @constructor */
             var Init = function(arr) {
-                splice.apply(this, zeroes2.concat(arr));
-            };
+                    splice.apply(this, zeroes2.concat(arr));
+                };
             // we want $'s prototype for new mauve arrays
             Init.prototype = $.prototype;
             // mauve is a wrapper around Init because we need to use new.
@@ -744,8 +762,13 @@ window['$'] = (function() {
         return mauve(flatten(this.map($children)).filter($nodeType));
     };
 
+    /** 
+     * Closure Compiler expects the second argument to Array.prototype.filter to be {Object|null|undefined}. Suppress this warning and pass a string.
+     * @suppress {checkTypes}
+     */
     mauvefn.siblings = function(selector) {
         var result = flatten(this.map($siblings)).filter($nodeTypeAndExcept, this);
+
         return mauve((typeof(selector) === 'string') ? result.filter($matchesSelector, selector) : result);
     };
 
@@ -771,7 +794,7 @@ window['$'] = (function() {
 
     mauvefn.is = function(selector) {
         var node = this[0];
-        if(node) {
+        if (node) {
             return node[matchesSelector] ? node[matchesSelector](selector) : false;
         }
         return false;
@@ -919,7 +942,7 @@ window['$'] = (function() {
             } else if (context instanceof arr) {
                 // $.query('.bar', [array]) is the same as mauve([array]).find('.bar')
                 return mauve(unique(context.filter($fromUnknown))).find(query);
-            } else if(context instanceof HTMLCollection || context instanceof HTMLAllCollection) {
+            } else if (context instanceof HTMLCollection || context instanceof HTMLAllCollection) {
                 return mauve(slice.call(context)).find(query);
             } else if (context instanceof NodeList || context instanceof NamedNodeMap) {
                 return mauve(slice.call(context).filter($nodeType)).find(query);
