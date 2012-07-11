@@ -11,6 +11,7 @@ window['$'] = (function() {
     var document = window.document;
     var NodeList = window.NodeList;
     var HTMLCollection = window.HTMLCollection;
+    /** @suppress {undefinedNames} */
     var HTMLAllCollection = window.HTMLAllCollection;
     var NamedNodeMap = window.NamedNodeMap;
     var arr = Array;
@@ -18,7 +19,8 @@ window['$'] = (function() {
     var slice = emptyArray.slice;
     var splice = emptyArray.splice;
     var documentReadyStates = ['complete', 'loaded', 'interactive'];
-    var documentNodeTypes = [1, 9, 11]; //mauve only allows elements, document and documentFragments.
+    //mauve only allows elements, document and documentFragments.
+    var documentNodeTypes = [1, 9, 11];
     var divNode = document.createElement('div');
     var divStyle = win.getComputedStyle(divNode, null);
     var fragmentDivNode = divNode.cloneNode(false);
@@ -35,7 +37,7 @@ window['$'] = (function() {
     }];
     var cssBoxSizings = {
         'content-box': 1,
-        // padding-box is gecko-only and endangered =(
+        // padding-box is currently gecko-only and endangered
         'padding-box': 2,
         'border-box': 3
     };
@@ -85,6 +87,11 @@ window['$'] = (function() {
     var camelizeFn = function(match, chr) {
             return chr ? chr.toUpperCase() : '';
         };
+    /**
+     * Return a camelized version of the given string.
+     * @param {string} str The string to camelize.
+     * @return {string} The camelized string.
+     */
     var camelize = function(str) {
             return str.replace(camelizeRE, camelizeFn);
         };
@@ -93,19 +100,22 @@ window['$'] = (function() {
      * xB3Qmc2l0rKZX8zNceoJ
      * dUypXdpQlcnfvy1UhhT7
      */
-     /**
-      * Unique for nodes.
-      * We do not preserve objects' xB3Qmc2l0rKZX8zNceoJ values; they are overridden and then deleted.
-      */
+     
     var uniqueTag = 'xB3Qmc2l0rKZX8zNceoJ';
-    var unique = function(array) {
+    /**
+     * Unique for nodes.
+     * We do not preserve objects' xB3Qmc2l0rKZX8zNceoJ values; they are overridden and then deleted.
+     * @param {Array.<Node>} nodes An array of nodes to uniqe.
+     * @return {Array.<Node>} A new array containing the elements of the given array only once.
+     */
+    var unique = function(nodes) {
             var tagged = arr(),
                 count = 0,
-                i = array.length,
+                i = nodes.length,
                 item;
 
             while (i--) {
-                item = array[i];
+                item = nodes[i];
                 if (item && !item.hasOwnProperty(uniqueTag)) {
                     item[uniqueTag] = count;
                     tagged[count++] = item;
@@ -123,12 +133,14 @@ window['$'] = (function() {
 
     /**
      * Unique for strings.
+     * @param {Array.<string>} strings An array of strings to unique.
+     * @return {Array.<string>} A new array containing the elements of the given array only once.
      */
-    var struniq = function(array) {
+    var struniq = function(strings) {
             var hash = {},
-                i = array.length;
+                i = strings.length;
             while (i--) {
-                hash[array[i]] = true;
+                hash[strings[i]] = true;
             }
             return Object.keys(hash);
         };
@@ -151,13 +163,13 @@ window['$'] = (function() {
 
     /**
      * The following functions are used by passing them in as parameters to map, forEach, filter etc.
-     * @this {Anything} function-dependent
+     * @this {*} function-dependent
      * @param {Node} el the node to filter
-     * @return {Anything} truthy if the node should pass through the filter, falsy otherwise
+     * @return {boolean} truthy if the node should pass through the filter, falsy otherwise
      */
     /**
      * Return true if the given parameter is truthy
-     * @param {Anyting} el Anything
+     * @param {*} el Anything
      */
     var $truthy = function(el) {
             return el;
@@ -173,7 +185,7 @@ window['$'] = (function() {
 
     /**
      * Return true if the given node's nodeType is valid and the given node is not included in the context array.
-     * @this {Node[]} The array of nodes to test for el's inclusion
+     * @this {Array.<Node>} The array of nodes to test for el's inclusion
      * @param {Node} el The node to test
      */
     var $nodeTypeAndExcept = function(el) {
@@ -191,7 +203,7 @@ window['$'] = (function() {
 
     /**
      * Return true if el is a node and has a valid nodeType
-     * @param {Anything} el The element to test
+     * @param {*} el The element to test
      */
     var $fromUnknown = function(el) {
             return el instanceof Node && documentNodeTypes.indexOf(el.nodeType) !== -1;
@@ -200,9 +212,9 @@ window['$'] = (function() {
     /**
      * map functions.
      * functions that return elements or arrays of elements are a bit special
-     * @this {Anything} function-dependent
+     * @this {*} function-dependent
      * @param {Node} el the element to map
-     * @return {Anything} the result of mapping el
+     * @return {*} the result of mapping el
      */
     /**
      * Return an array of the descendants of el that match the query in this
@@ -306,7 +318,7 @@ window['$'] = (function() {
     } : function(el) {
         // TODO IF Android < 3 support is not required, just use classList
         // concat current className with given string -> split -> unique -> join
-        el.className = (struniq(el.className + ' ' + this).split(' ')).join(' ');
+        el.className = struniq((el.className + ' ' + this).split(' ')).join(' ');
     };
 
 
