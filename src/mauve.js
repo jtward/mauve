@@ -243,24 +243,28 @@ window['$'] = (function() {
      * Return the first descendant of el that matches the this selector.
      * @this {string} A selector to query with.
      * @param {Node} el The element to find matches under.
-     * @return {Node} The first node inder the given element that matches the this selector.
+     * @return {Node} The first node under the given element that matches the this selector.
      */
     var $query = function(el) {
             return el.querySelector(this);
         };
 
     /**
-     * Return a deep clone of el
+     * Return a deep clone of el.
+     * @param {Node} el The node to clone.
+     * @return {Node} a deep clone of the given node.
      */
     var $deepclone = function(el) {
             return el.cloneNode(true);
         };
 
     /**
-     * Return the direct child elements of el
+     * Return a plain array of the direct descendants of the given node.
+     * @param {Node} el The parent of the returned nodes.
+     * @return {Array.<Node>} The direct descendants of the given node.
      */
-    var $children = function(a) {
-            return slice.call(a.childNodes, 0);
+    var $children = function(el) {
+            return slice.call(el.childNodes, 0);
         };
 
     /**
