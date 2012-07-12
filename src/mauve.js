@@ -204,7 +204,7 @@ window['$'] = (function() {
 
     /**
      * Return true if the given element is matched by the this string.
-     * @this {String} A selector string.
+     * @this {string} A selector string.
      * @param {Node} el The node to test.
      * @return {boolean} true if the given node matches the this selector, false otherwise.
      */
@@ -274,18 +274,22 @@ window['$'] = (function() {
      */
     var $siblings = function(el) {
             var parent = el.parentNode;
-            return parent ? slice.call(parent.childNodes, 0) : [];
+            return parent ? slice.call(parent.childNodes, 0) : arr();
         };
 
     /**
-     * Return the direct parent of el or null
+     * Return the direct parent of the given node if present, null otherwise.
+     * @param {Node} el The node whose parent to return.
+     * @return {?Node} The parent of the given node if present, null otherwise.
      */
     var $parent = function(el) {
             return el.parentNode;
         };
 
     /**
-     * return an array of all of the parents of el
+     * Find the parents of the given node and return in an array.
+     * @param {Node} el The node whose parents to return.
+     * @return {Array.<Node>} An array of the parent nodes of the given node.
      */
     var $parents = function(el) {
             var parents = arr(),
@@ -299,22 +303,39 @@ window['$'] = (function() {
         };
 
     /**
-     * Return the computed value of the css property this or the style value
+     * Return the computed value of the CSS property this or the style value
+     * @this {string} The name of the CSS property to retrieve.
+     * @param {Node} el The node to retrieve the CSS property for.
+     * @return {string} The value of the CSS property on the given node.
      */
     var $getCss = function(el) {
             return win.getComputedStyle(el, null).getPropertyValue(this) || el.style[camelize(this)];
         };
 
     /* foreaches: modify; no return value */
+    /**
+     * Remove the given node from its parent.
+     * @param {Node} el The node to remove.
+     */
     var $remove = function(el) {
-            if (el.parentNode) {
-                el.parentNode.removeChild(el);
-            }
+            var parent;
+            (parent = el.parentNode) && (parent.removeChild(el));
         };
 
+    /**
+     * Append the given node to the context node.
+     * @this {Node} The node to append the given node to.
+     * @param {Node} The node to append.
+     */
     var $reverseAppendNode = function(el) {
             this.appendChild(el);
         };
+
+    /**
+     * Prepend the given node to the context node.
+     * @this {Node} The node to prepend the given node to.
+     * @param {Node} The node to prepend.
+     */
     var $reversePrependNode = function(el, idx) {
             if (el.childNodes.length) {
                 this.insertBefore(el, this.childNodes[idx]);
@@ -322,6 +343,8 @@ window['$'] = (function() {
                 this.appendChild(el);
             }
         };
+
+    
     var $reverseAfterNode = function(el) {
             this.parentNode.insertBefore(el, this.nextSibling);
         };
