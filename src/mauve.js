@@ -268,10 +268,13 @@ window['$'] = (function() {
         };
 
     /**
-     * Return an array containing the siblings of el (including el itself) if el has a parent, [null] otherwise
+     * Return an array containing the siblings of the given node (including the node itself). Empty if the given node does not have a parent.
+     * @param {Node} el The node to find siblings of.
+     * @return {Array.<Node>} The siblings of the given node (including the node itself). Empty if the given node does not have a parent.
      */
     var $siblings = function(el) {
-            return slice.call(el.parentNode && el.parentNode.childNodes, 0);
+            var parent = el.parentNode;
+            return parent ? slice.call(parent.childNodes, 0) : [];
         };
 
     /**
