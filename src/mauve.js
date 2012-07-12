@@ -332,19 +332,19 @@ window['$'] = (function() {
         };
 
     /**
-     * Prepend the given node to the context node.
-     * @this {Node} The node to prepend the given node to.
-     * @param {Node} The node to prepend.
+     * Insert the given node to the context node at the given index.
+     * @this {Node} The node to insert the given node into.
+     * @param {Node} The node to insert.
+     * @param {number} The index to insert at.
      */
     var $reversePrependNode = function(el, idx) {
-            if (el.childNodes.length) {
+            if (this.childNodes.length) {
                 this.insertBefore(el, this.childNodes[idx]);
             } else {
                 this.appendChild(el);
             }
         };
 
-    
     var $reverseAfterNode = function(el) {
             this.parentNode.insertBefore(el, this.nextSibling);
         };
