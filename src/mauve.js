@@ -97,11 +97,6 @@ window['$'] = (function() {
             return str.replace(camelizeRE, camelizeFn);
         };
 
-    /**
-     * xB3Qmc2l0rKZX8zNceoJ
-     * dUypXdpQlcnfvy1UhhT7
-     */
-
     var uniqueTag = 'xB3Qmc2l0rKZX8zNceoJ';
     /**
      * Unique for nodes.
