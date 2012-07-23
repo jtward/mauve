@@ -10,7 +10,7 @@ window['$'] = (function() {
     var win = window;
     var document = window.document;
     var NodeList = window.NodeList;
-    var HTMLCollection = window.HTMLCollection; /** @suppress {undefinedNames} */
+    var HTMLCollection = window.HTMLCollection;
     var HTMLAllCollection = window.HTMLAllCollection;
     var NamedNodeMap = window.NamedNodeMap;
     var arr = Array;
@@ -165,8 +165,8 @@ window['$'] = (function() {
     /**
      * The following functions are used by passing them in as parameters to map, forEach, filter etc.
      * @this {*} function-dependent
-     * @param {Node} el the node to filter
-     * @return {boolean} truthy if the node should pass through the filter, falsy otherwise
+     * @param {Node} el the node to filter.
+     * @return {boolean} truthy if the node should pass through the filter, falsy otherwise.
      */
     /**
      * Return truthy if the given parameter is truthy.
@@ -226,7 +226,7 @@ window['$'] = (function() {
     /**
      * Return an array of the descendants of el that match the query in this.
      * @this {string} A selector to query with.
-     * @param {Node} el The element to find matches under.
+     * @param {Node} el The element under which to find matches.
      * @return {Array.<Node>} An array of the nodes under the given element that match the this selector.
      */
     var $queryAll = function(el) {
@@ -236,8 +236,8 @@ window['$'] = (function() {
 
     /**
      * Return the first descendant of el that matches the this selector.
-     * @this {string} A selector to query with.
-     * @param {Node} el The element to find matches under.
+     * @this {string} A query selector.
+     * @param {Node} el The element under which to find matches.
      * @return {Node} The first node under the given element that matches the this selector.
      */
     var $query = function(el) {
@@ -247,7 +247,7 @@ window['$'] = (function() {
     /**
      * Return a deep clone of el.
      * @param {Node} el The node to clone.
-     * @return {Node} a deep clone of the given node.
+     * @return {Node} A deep clone of the given node.
      */
     var $deepclone = function(el) {
             return el.cloneNode(true);
@@ -264,7 +264,7 @@ window['$'] = (function() {
 
     /**
      * Return an array containing the siblings of the given node (including the node itself). Empty if the given node does not have a parent.
-     * @param {Node} el The node to find siblings of.
+     * @param {Node} el The node from which to return the siblings.
      * @return {Array.<Node>} The siblings of the given node (including the node itself). Empty if the given node does not have a parent.
      */
     var $siblings = function(el) {
@@ -300,7 +300,7 @@ window['$'] = (function() {
     /**
      * Return the computed value of the CSS property this or the style value
      * @this {string} The name of the CSS property to retrieve.
-     * @param {Node} el The node to retrieve the CSS property for.
+     * @param {Node} el The node for which to retrieve the CSS property.
      * @return {string} The value of the CSS property on the given node.
      */
     var $getCss = function(el) {
@@ -312,15 +312,18 @@ window['$'] = (function() {
      * Remove the given node from its parent.
      * @param {Node} el The node to remove.
      */
+     /*jshint boss:true */
     var $remove = function(el) {
             var parent;
-            (parent = el.parentNode) && (parent.removeChild(el));
+            if(parent = el.parentNode) {
+                parent.removeChild(el);
+            }
         };
 
     /**
      * Append the given node to the context node.
-     * @this {Node} The node to append the given node to.
-     * @param {Node} The node to append.
+     * @this {Node} The node to which to append the given node.
+     * @param {Node} el The node to append.
      */
     var $reverseAppendNode = function(el) {
             this.appendChild(el);
@@ -328,9 +331,9 @@ window['$'] = (function() {
 
     /**
      * Insert the given node to the context node at the given index.
-     * @this {Node} The node to insert the given node into.
-     * @param {Node} The node to insert.
-     * @param {number} The index to insert at.
+     * @this {Node} The node into which to insert the given node.
+     * @param {Node} el The node to insert.
+     * @param {number} idx The index at which to insert the given node.
      */
     var $reversePrependNode = function(el, idx) {
             if (this.childNodes.length) {
@@ -340,9 +343,20 @@ window['$'] = (function() {
             }
         };
 
+    /**
+     * Insert the given node to the context node's parent node after the context node.
+     * @this {Node} The node after which to insert the given node.
+     * @param {Node} el The node to insert.
+     */
     var $reverseAfterNode = function(el) {
             this.parentNode.insertBefore(el, this.nextSibling);
         };
+
+    /**
+     * Insert the given node to the context node's parent node before the context node.
+     * @this {Node} The node before which to insert the given node.
+     * @param {Node} el The node to insert.
+     */
     var $reverseBeforeNode = function(el) {
             var parent = el.parentNode;
             if (parent) {
@@ -350,8 +364,11 @@ window['$'] = (function() {
             }
         };
 
-
-    // addClass implementation depends on support for classList
+    /**
+     * Add the this classes to the given node.
+     * @this {string} A space-separated list of CSS class names.
+     * @param {Node} el The node to which to add the classes.
+     */
     var $addClass = divNode.classList ?
     function(el) {
         var list = this.split(' '),
@@ -365,7 +382,11 @@ window['$'] = (function() {
         el.className = struniq((el.className + ' ' + this).split(' ')).join(' ');
     };
 
-
+    /**
+     * Remove the this classes from the given node.
+     * @this {string} A space-separated list of CSS class names.
+     * @param {Node} el The node from which to remove the classes.
+     */
     var $removeClass = divNode.classList ?
     function(el) {
         var list = this.split(' '),
@@ -389,14 +410,29 @@ window['$'] = (function() {
         el.className = current.join(' ');
     };
 
+    /**
+     * Set an attribute on the given node.
+     * @this {Array.<string>} A 2-array containing the name and new value of the attribute.
+     * @param {Node} el The node on which to set the attribute.
+     */
     var $setAttribute = function(el) {
             el.setAttribute(this[0], this[1]);
         };
 
+    /**
+     * Set a property on the given node.
+     * @this {Array.<string>} A 2-array containing the name and new value of the property.
+     * @param {Node} el The node on which to set the attribute.
+     */
     var $setProperty = function(el) {
             el[this[0]] = this[1];
         };
 
+    /**
+     * Set the value of the 'value' property of the given element.
+     * @this {string|number} The new value.
+     * @param {Node} el The node on which to set the value.
+     */
     var $setValue = function(el) {
             el.value = this;
         };
@@ -405,6 +441,11 @@ window['$'] = (function() {
     // 0: {string} property name
     // 1: {string} property value
     // 2: {boolean} important
+    /**
+     * Set a CSS property on the given node.
+     * @this {Array.<string|number|boolean>} The property name, value and whether the property's priority is important (false by default).
+     * @param {Node} el The node on which to set the CSS property.
+     */
     var $setCss = function(el) {
             var value = this[1];
             // can't use double-equality here because empty string should not pass the test but zero should
@@ -415,18 +456,39 @@ window['$'] = (function() {
             }
         };
 
+    /**
+     * Set the text on the given node.
+     * @this {string} The new text.
+     * @param {Node} el The node on which to set the text.
+     */
     var $setText = function(el) {
             el.textContent = this;
         };
 
+    /**
+     * Set the width of the given node.
+     * @this {string} The new width.
+     * @param {Node} el The node on which to set the width.
+     */
     var $setWidth = function(el) {
             el.style.width = this;
         };
 
+    /**
+     * Set the height of the given node.
+     * @this {string} The new height.
+     * @param {Node} el The node on which to set the height.
+     */
     var $setHeight = function(el) {
             el.style.height = this;
         };
 
+    /**
+     * Return the nearest preceding sibling of the given node that matches the this selector, undefined if the given node does not have a parent or is the first child of its parent.
+     * @this {?string} A query selector.
+     * @param {Node} el The node from which to find the preceding sibling.
+     * @return {Node|undefined} The nearest preceding sibling of the given node that matches the this selector, undefined if the given node does not have a parent or is the first child of its parent.
+     */
     var $prev = function(el) {
             var parent = el.parentNode,
                 siblings, i;
