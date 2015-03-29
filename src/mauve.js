@@ -1025,7 +1025,7 @@ window['$'] = (function() {
                 if (dimIndex <= 0) {
                     dimIndex = cssBoxSizings[style.getPropertyValue(boxSizingPropertyName)];
                 }
-                result = style.offsetWidth;
+                result = node.offsetWidth;
                 if (dimIndex === 1) {
                     result -= (parseFloat(style.getPropertyValue('padding-left')) + parseFloat(style.getPropertyValue('padding-right')));
                 }
