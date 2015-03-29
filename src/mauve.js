@@ -7,13 +7,11 @@
 /*global Node:false*/
 window['$'] = (function() {
     'use strict';
-    var win = window;
     var document = window.document;
     var NodeList = window.NodeList;
     var HTMLCollection = window.HTMLCollection;
     var HTMLAllCollection = window.HTMLAllCollection;
     var NamedNodeMap = window.NamedNodeMap;
-    var arr = Array;
     var emptyArray = [];
     var slice = emptyArray.slice;
     var splice = emptyArray.splice;
@@ -22,7 +20,7 @@ window['$'] = (function() {
     //mauve only allows elements, document and documentFragments.
     var documentNodeTypes = [1, 9, 11];
     var divNode = document.createElement('div');
-    var divStyle = win.getComputedStyle(divNode, null);
+    var divStyle = window.getComputedStyle(divNode, null);
     var fragmentDivNode = divNode.cloneNode(false);
     
     var cssDimensions = [{
@@ -68,27 +66,6 @@ window['$'] = (function() {
         }
     }
 
-    // use__proto__ is true if objects have a mutable __proto__ property
-    var use__proto__ = (function() {
-        var o = {};
-
-        if (!o.__proto__) {
-            // no __proto__!
-            return false;
-        }
-
-        // a temporary function to use as a prototype; keep CC happy by returning a value
-        var p = function() {
-            return {};
-        };
-
-        // attempt to set __proto__
-        o.__proto__ = p;
-        
-        // return true if the overwrite was successful; false otherwise
-        return o.__proto__ === p;
-    }());
-
     var idSelectorRE = /^#([\w\-]+)$/;
     var classSelectorRE = /^\.([\w\-]+)$/;
     var tagSelectorRE = /^[\w\-]+$/;
@@ -117,7 +94,7 @@ window['$'] = (function() {
      * @return {Array.<Node>} A new array containing the elements of the given array only once.
      */
     var unique = function(nodes) {
-        var tagged = arr(),
+        var tagged = [],
             count = 0,
             i = nodes.length,
             item;
@@ -281,7 +258,7 @@ window['$'] = (function() {
      */
     var $siblings = function(el) {
         var parent = el.parentNode;
-        return parent ? slice.call(parent.childNodes, 0) : arr();
+        return parent ? slice.call(parent.childNodes, 0) : [];
     };
 
     /**
@@ -299,7 +276,7 @@ window['$'] = (function() {
      * @return {Array.<Node>} An array of the parent nodes of the given node.
      */
     var $parents = function(el) {
-        var parents = arr(),
+        var parents = [],
             parentNode = el.parentNode;
         while (parentNode && parentNode !== document) {
             parents.push(parentNode);
@@ -316,7 +293,7 @@ window['$'] = (function() {
      * @return {string} The value of the CSS property on the given node.
      */
     var $getCss = function(el) {
-        return win.getComputedStyle(el, null).getPropertyValue(this) || el.style[camelize(this)];
+        return window.getComputedStyle(el, null).getPropertyValue(this) || el.style[camelize(this)];
     };
 
     /* foreaches: modify; no return value */
@@ -558,7 +535,7 @@ window['$'] = (function() {
         context = context || document;
 
         if (match) {
-            return arr(context.getElementById(match[1]));
+            return [context.getElementById(match[1])];
         }
 
         match = classSelectorRE.exec(selector);
@@ -641,7 +618,7 @@ window['$'] = (function() {
         else if (query instanceof mauve) {
             return query;
         }
-        else if (query instanceof arr) {
+        else if (query instanceof Array) {
             return mauve(unique(query.filter($fromUnknown)));
         }
         else if (query instanceof HTMLCollection || query instanceof HTMLAllCollection) {
@@ -651,7 +628,7 @@ window['$'] = (function() {
             return mauve(slice.call(query).filter($nodeType));
         }
         else if (query instanceof Node && documentNodeTypes.indexOf(query.nodeType) !== -1) {
-            return mauve(arr(query));
+            return mauve([query]);
         }
         else if (typeof query === 'function') {
             if (documentReadyStates.indexOf(document.readyState) !== -1) {
@@ -665,41 +642,31 @@ window['$'] = (function() {
             return this;
         }
         else if (query === window) {
-            return mauve(arr(query));
+            return mauve([query]);
         }
         else {
-            return mauve(arr());
+            return mauve([]);
         }
     };
 
-    $.prototype = Object.create(arr.prototype);
+    $.prototype = Object.create(Array.prototype);
 
-    var mauve;
-    if (use__proto__) {
-        mauve = function(arr) {
-            // this is the way to do it iff we can write to __proto__; no copying required!
-            arr.__proto__ = $.prototype;
-            return arr;
+    var mauve = (function() {
+        $.prototype.constructor = $;
+        // concat does not mutate so we can reuse this
+        var zeroes2 = [0, 0];
+        // constructor; make self a copy of the given array by splicing in
+        /** @constructor */
+        var Init = function(contents) {
+            splice.apply(this, zeroes2.concat(contents));
         };
-    }
-    else {
-        (function() {
-            $.prototype.constructor = $;
-            // concat does not mutate so we can reuse this
-            var zeroes2 = [0, 0];
-            // constructor; make self a copy of the given array by splicing in
-            /** @constructor */
-            var Init = function(arr) {
-                splice.apply(this, zeroes2.concat(arr));
-            };
-            // we want $'s prototype for new mauve arrays
-            Init.prototype = $.prototype;
-            // mauve is a wrapper around Init because we need to use new.
-            mauve = function(arr) {
-                return new Init(arr);
-            };
-        }());
-    }
+        // we want $'s prototype for new mauve arrays
+        Init.prototype = $.prototype;
+        // mauve is a wrapper around Init because we need to use new.
+        return function(contents) {
+            return new Init(contents);
+        };
+    }());
 
     var mauvefn = $.prototype;
 
@@ -735,11 +702,11 @@ window['$'] = (function() {
         while (i < max) {
             result = queryfn(match, this[i]);
             if (result) {
-                return mauve(arr(result));
+                return mauve([result]);
             }
             i += 1;
         }
-        return mauve(arr());
+        return mauve([]);
     };
 
     mauvefn.find = function(selector) {
@@ -829,7 +796,7 @@ window['$'] = (function() {
             else if (stuff instanceof Node) {
                 this.forEach(withNode, stuff);
             }
-            else if (stuff instanceof arr) {
+            else if (stuff instanceof Array) {
                 this.forEach(withNodes, stuff);
             }
             else if (stuff instanceof NodeList ||
@@ -866,7 +833,7 @@ window['$'] = (function() {
             return this[0] ? this[0].getAttribute(name) : undefined;
         }
         else {
-            // using arguments here is faster than using arr(name, value)
+            // using arguments here is faster than using [name, value]
             this.forEach($setAttribute, arguments);
             return this;
         }
@@ -908,7 +875,7 @@ window['$'] = (function() {
             // TODO: profiling!
             keys = Object.keys(name);
             i = keys.length;
-            a = arr(2);
+            a = new Array(2);
             while (i--) {
                 key = keys[i];
                 a[0] = key;
@@ -973,7 +940,7 @@ window['$'] = (function() {
         else if (context instanceof mauve) {
             context = context[0];
         }
-        else if (context instanceof arr) {
+        else if (context instanceof Array) {
             context = context.filter($fromUnknown)[0];
         }
         else if (context instanceof NodeList ||
@@ -995,8 +962,8 @@ window['$'] = (function() {
         }
 
         return node ?
-            mauve(arr(node)) :
-            mauve(arr());
+            mauve([node]) :
+            mauve([]);
     };
 
     mauvefn.text = function(text) {
@@ -1010,21 +977,21 @@ window['$'] = (function() {
     mauvefn.eq = function(index) {
         if (this.length) {
             if (index >= 0) {
-                return mauve(arr(this[index] || this[index % this.length]));
+                return mauve([this[index] || this[index % this.length]]);
             }
             else if (index < 0) {
-                return mauve(arr(this[this.length + index] || this[(-index) % this.length]));
+                return mauve([this[this.length + index] || this[(-index) % this.length]]);
             }
         }
-        return mauve(arr());
+        return mauve([]);
     };
 
     mauvefn.first = function() {
         if (this.length) {
-            return mauve(arr(this[0]));
+            return mauve([this[0]]);
         }
         else {
-            return mauve(arr());
+            return mauve([]);
         }
     };
 
@@ -1055,7 +1022,7 @@ window['$'] = (function() {
                 return Math.max(document.documentElement.offsetWidth, document.documentElement.scrollWidth);
             }
             else if (node) {
-                style = win.getComputedStyle(node, null);
+                style = window.getComputedStyle(node, null);
                 dimIndex = cssDimensions.indexOf(value);
                 if (dimIndex <= 0) {
                     dimIndex = cssBoxSizings[style.getPropertyValue(boxSizingPropertyName)];
@@ -1092,7 +1059,7 @@ window['$'] = (function() {
                 return Math.max(document.documentElement.offsetHeight, document.documentElement.scrollHeight);
             }
             else if (node) {
-                style = win.getComputedStyle(node, null);
+                style = window.getComputedStyle(node, null);
                 dimIndex = cssDimensions.indexOf(value);
                 if (dimIndex <= 0) {
                     dimIndex = cssBoxSizings[style.getPropertyValue(boxSizingPropertyName)];
@@ -1138,7 +1105,7 @@ window['$'] = (function() {
                 // $.query('.bar', [mauve]) is the same as [mauve].find('.bar')
                 return context.find(query);
             }
-            else if (context instanceof arr) {
+            else if (context instanceof Array) {
                 // $.query('.bar', [array]) is the same as mauve([array]).find('.bar')
                 return mauve(unique(context.filter($fromUnknown))).find(query);
             }
@@ -1152,7 +1119,7 @@ window['$'] = (function() {
                 return mauve(qsa(query, context));
             }
             else {
-                return mauve(arr());
+                return mauve([]);
             }
         }
         else {
@@ -1170,7 +1137,7 @@ window['$'] = (function() {
                 // $.query('.bar', [mauve]) is the same as [mauve].find('.bar')
                 return context.findFirst(query);
             }
-            else if (context instanceof arr) {
+            else if (context instanceof Array) {
                 // $.query('.bar', [mauve]) is the same as [mauve].find('.bar')
                 return mauve(unique(context.filter($fromUnknown))).findFirst(query);
             }
@@ -1181,14 +1148,14 @@ window['$'] = (function() {
                 return mauve(slice.call(context).filter($nodeType)).findFirst(query);
             }
             else if (context instanceof Node && documentNodeTypes.indexOf(context.nodeType) !== -1) {
-                return mauve(arr(qs(query, context)));
+                return mauve([qs(query, context)]);
             }
             else {
-                return mauve(arr());
+                return mauve([]);
             }
         }
         else {
-            return mauve(arr(qs(query, document)));
+            return mauve([qs(query, document)]);
         }
     };
 
