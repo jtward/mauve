@@ -85,7 +85,6 @@ window['$'] = (function() {
         return str.replace(camelizeRE, camelizeFn);
     };
 
-    var uniqueTag = 'xB3Qmc2l0rKZX8zNceoJ';
     /**
      * Unique for nodes.
      * We do not preserve objects' xB3Qmc2l0rKZX8zNceoJ values; they are overridden and then deleted.
@@ -93,23 +92,15 @@ window['$'] = (function() {
      * @return {Array.<Node>} A new array containing the elements of the given array only once.
      */
     var unique = function(nodes) {
-        var tagged = [],
-            count = 0,
-            i = nodes.length,
-            item;
+        var tagged = [];
+        var i;
+        var item;
 
-        while (i--) {
+        for (i = 0; i < nodes.length; i += 1) {
             item = nodes[i];
-            if (item && !item.hasOwnProperty(uniqueTag)) {
-                item[uniqueTag] = count;
-                tagged[count++] = item;
+            if (item && tagged.indexOf(item) === -1) {
+                tagged.push(item);
             }
-        }
-
-        // remove the tags (TODO: is this necessary?)
-        i = tagged.length;
-        while (i--) {
-            delete tagged[i][uniqueTag];
         }
 
         return tagged;
@@ -148,22 +139,6 @@ window['$'] = (function() {
         }
         // We flattened in-place, but return for chaining
         return a;
-    };
-
-    /**
-     * The following functions are used by passing them in as parameters to map, forEach, filter etc.
-     * @this {*} function-dependent
-     * @param {Node} el the node to filter.
-     * @return {boolean} truthy if the node should pass through the filter, falsy otherwise.
-     */
-    /**
-     * Return truthy if the given parameter is truthy.
-     * @param {*} el Anything.
-     * @return {*} el.
-     */
-    var $truthy = function(el) {
-        // don't bother converting to a real boolean
-        return el;
     };
 
     /**
@@ -222,15 +197,6 @@ window['$'] = (function() {
         return slice.call(el.querySelectorAll(this), 0);
     };
 
-    /**
-     * Return the first descendant of el that matches the this selector.
-     * @this {string} A query selector.
-     * @param {Node} el The element under which to find matches.
-     * @return {Node} The first node under the given element that matches the this selector.
-     */
-    var $query = function(el) {
-        return el.querySelector(this);
-    };
 
     /**
      * Return a deep clone of el.
@@ -578,24 +544,12 @@ window['$'] = (function() {
         return context.getElementsByClassName(selector)[0];
     };
 
-    var getElementsByClassName = function(selector, context) {
-        return context.getElementsByClassName(selector);
-    };
-
     var getElementByTagName = function(selector, context) {
         return context.getElementsByTagName(selector)[0];
     };
 
-    var getElementsByTagName = function(selector, context) {
-        return context.getElementsByTagName(selector);
-    };
-
     var getElementByQuery = function(selector, context) {
         return context.querySelector(selector);
-    };
-
-    var getElementsByQuery = function(selector, context) {
-        return context.querySelectorAll(selector);
     };
 
     var hasClass = divNode.classList ?
@@ -857,7 +811,7 @@ window['$'] = (function() {
         }
     };
 
-    mauvefn.css = function(name, value, important) {
+    mauvefn.css = function(name, value) {
         var keys, key, i, a;
         if (typeof name === 'string') {
             if (value === undefined) {
