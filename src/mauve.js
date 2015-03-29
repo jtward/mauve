@@ -10,7 +10,6 @@ window['$'] = (function() {
     var document = window.document;
     var NodeList = window.NodeList;
     var HTMLCollection = window.HTMLCollection;
-    var HTMLAllCollection = window.HTMLAllCollection;
     var NamedNodeMap = window.NamedNodeMap;
     var emptyArray = [];
     var slice = emptyArray.slice;
@@ -621,7 +620,7 @@ window['$'] = (function() {
         else if (query instanceof Array) {
             return mauve(unique(query.filter($fromUnknown)));
         }
-        else if (query instanceof HTMLCollection || query instanceof HTMLAllCollection) {
+        else if (query instanceof HTMLCollection) {
             return mauve(slice.call(query));
         }
         else if (query instanceof NodeList || query instanceof NamedNodeMap) {
@@ -801,7 +800,6 @@ window['$'] = (function() {
             }
             else if (stuff instanceof NodeList ||
                 stuff instanceof HTMLCollection ||
-                stuff instanceof HTMLAllCollection ||
                 stuff instanceof NamedNodeMap) {
 
                 stuff = slice.call(stuff, 0);
@@ -1109,7 +1107,7 @@ window['$'] = (function() {
                 // $.query('.bar', [array]) is the same as mauve([array]).find('.bar')
                 return mauve(unique(context.filter($fromUnknown))).find(query);
             }
-            else if (context instanceof HTMLCollection || context instanceof HTMLAllCollection) {
+            else if (context instanceof HTMLCollection) {
                 return mauve(slice.call(context)).find(query);
             }
             else if (context instanceof NodeList || context instanceof NamedNodeMap) {
@@ -1141,7 +1139,7 @@ window['$'] = (function() {
                 // $.query('.bar', [mauve]) is the same as [mauve].find('.bar')
                 return mauve(unique(context.filter($fromUnknown))).findFirst(query);
             }
-            else if (context instanceof HTMLCollection || context instanceof HTMLAllCollection) {
+            else if (context instanceof HTMLCollection) {
                 return mauve(slice.call(context)).findFirst(query);
             }
             else if (context instanceof NodeList || context instanceof NamedNodeMap) {
